@@ -16,46 +16,46 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/reservations")
 public class ReservationController {
 
-    ReservationService reservationService;
+    private final ReservationService reservationService;
 
     @PostMapping("/reservation-info")
-    public ResponseEntity<?> reservationInfo(@RequestBody ReservationInfoRequest request) {
+    public ResponseEntity<?> reservationInfo(@RequestBody final ReservationInfoRequest request) {
+        System.out.println(request);
         if(request.getStudentNumber() == null || request.getStudentNumber().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("학번은 필수입니다.");
         }
         if(request.getPassword() == null || request.getPassword().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호는 필수입니다.");
         }
-        Reservation response = reservationService.searchReservationInfo(request.getStudentNumber(), request.getPassword());
+        List<Reservation> response = reservationService.searchReservationInfo(request.getStudentNumber(), request.getPassword());
         return ResponseEntity.ok(response);
     }
 
 
-    @PostMapping("/reservations")
-    public ResponseEntity<?> reserveRoom(@RequestBody final ReservationRequest request) {
+    @PostMapping()
+    public Reservation createReservation(@RequestBody final ReservationRequest request) {
         //todo - 검증 과정 추가로 필요함
-
         try {
-            reservationService.createReservation(request);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return reservationService.createReservation(request);
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
 
-    @DeleteMapping("/reservations")
-    public ResponseEntity<?> cancelReservations(@RequestBody final Map<String, List<String>> request) {
+    @DeleteMapping()
+    public ResponseEntity<String> cancelReservations(@RequestBody final Map<String, List<String>> request) {
+        System.out.println(request);
         try {
-            List<String> ids = request.get("reservation_id");
-            reservationService.cancelReservations(ids);
-            return ResponseEntity.noContent().build();
+            List<String> ids = request.get("reservationId");
+            return reservationService.cancelReservations(ids);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
