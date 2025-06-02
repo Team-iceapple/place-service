@@ -1,6 +1,6 @@
 package iceapple.placeservice.repository.mock;
 
-import iceapple.placeservice.domain.Reservation;
+import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.request.ReservationRequest;
 import iceapple.placeservice.repository.ReservationRepository;
 import java.time.LocalDateTime;

@@ -1,6 +1,6 @@
 package iceapple.placeservice.repository.jdbc;
 
-import iceapple.placeservice.domain.Room;
+import iceapple.placeservice.entity.Room;
 import iceapple.placeservice.repository.RoomRepository;
 import iceapple.placeservice.util.TimeCount;
 import java.time.LocalDate;

@@ -1,7 +1,6 @@
 package iceapple.placeservice.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import iceapple.placeservice.domain.Reservation;
+import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.request.ReservationInfoRequest;
 import iceapple.placeservice.dto.request.ReservationRequest;
 import iceapple.placeservice.service.ReservationService;

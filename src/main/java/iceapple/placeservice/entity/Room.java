@@ -1,4 +1,4 @@
-package iceapple.placeservice.domain;
+package iceapple.placeservice.entity;
 
 import lombok.Getter;
 import lombok.Setter;

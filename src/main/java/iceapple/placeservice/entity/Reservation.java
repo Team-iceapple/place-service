@@ -1,4 +1,4 @@
-package iceapple.placeservice.domain;
+package iceapple.placeservice.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;

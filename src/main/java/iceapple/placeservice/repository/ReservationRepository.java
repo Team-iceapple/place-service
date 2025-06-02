@@ -1,6 +1,6 @@
 package iceapple.placeservice.repository;
 
-import iceapple.placeservice.domain.Reservation;
+import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.request.ReservationRequest;
 import java.util.List;
 import org.springframework.http.ResponseEntity;

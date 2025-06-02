@@ -1,12 +1,10 @@
 package iceapple.placeservice.repository.mock;
 
-import iceapple.placeservice.domain.Room;
-import iceapple.placeservice.dto.response.RoomTimeCountResponse;
+import iceapple.placeservice.entity.Room;
 import iceapple.placeservice.repository.RoomRepository;
 import iceapple.placeservice.util.TimeCount;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

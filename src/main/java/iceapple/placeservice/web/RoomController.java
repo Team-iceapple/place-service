@@ -1,6 +1,6 @@
 package iceapple.placeservice.web;
 
-import iceapple.placeservice.domain.Room;
+import iceapple.placeservice.entity.Room;
 import iceapple.placeservice.dto.response.RoomTimeCountResponse;
 import iceapple.placeservice.service.RoomService;
 import java.time.LocalDate;
