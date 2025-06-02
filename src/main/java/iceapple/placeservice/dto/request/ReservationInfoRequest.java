@@ -7,6 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReservationInfoRequest {
+
+    @JsonProperty("student_number")
     private String studentNumber;
     private String password;
 
