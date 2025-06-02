@@ -41,7 +41,7 @@ public class ReservationController {
 
     @PostMapping()
     public Reservation createReservation(@RequestBody final ReservationRequest request) {
-        //todo - 검증 과정 추가로 필요함
+        //todo - 입력 정보 검증 과정 추가로 필요함
         try {
             return reservationService.createReservation(request);
         } catch (IllegalStateException e) {
