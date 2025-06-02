@@ -7,7 +7,9 @@ import lombok.Getter;
 @Builder
 @Getter
 public class RoomTimeCountResponse {
-    private String roomId;
     private String name;
-    private List<Integer> count;
+    private int[] count;
 }
+
+
+

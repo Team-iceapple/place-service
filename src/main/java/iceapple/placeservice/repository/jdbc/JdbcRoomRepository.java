@@ -1,8 +1,8 @@
 package iceapple.placeservice.repository.jdbc;
 
 import iceapple.placeservice.domain.Room;
-import iceapple.placeservice.dto.response.RoomTimeCountResponse;
 import iceapple.placeservice.repository.RoomRepository;
+import iceapple.placeservice.util.TimeCount;
 import java.time.LocalDate;
 import java.util.List;
 import javax.sql.DataSource;
@@ -25,12 +25,18 @@ public class JdbcRoomRepository implements RoomRepository {
     }
 
     @Override
-    public RoomTimeCountResponse findById(final String id, final LocalDate date) {
-        String sql = "SELECT * FROM time_count WHERE room_id = ? AND date = ?";
-        RoomTimeCountResponse timeCount;
-
-        return null;
+    public List<TimeCount> findTimeCount(String roomId, LocalDate date) {
+        String sql = "SELECT time, count FROM time_count WHERE room_id = ? AND date = ?";
+        return jdbcTemplate.query(sql, new Object[]{roomId, date},
+                (rs, rowNum) -> new TimeCount(rs.getInt("time"), rs.getInt("count")));
     }
+
+
+    public String findRoomNameById(String roomId) {
+        String sql = "SELECT name FROM room WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{roomId}, String.class);
+    }
+
 
     private RowMapper<Room> rowMapper() {
         return (rs, rowNum) -> new Room(

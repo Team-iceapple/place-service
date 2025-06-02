@@ -3,6 +3,7 @@ package iceapple.placeservice.service;
 import iceapple.placeservice.domain.Room;
 import iceapple.placeservice.dto.response.RoomTimeCountResponse;
 import iceapple.placeservice.repository.RoomRepository;
+import iceapple.placeservice.util.TimeCount;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,19 @@ public class RoomService {
     }
 
     public RoomTimeCountResponse findByRoomId(String id, LocalDate date) {
-        return roomRepository.findById(id, date);
+        String name = roomRepository.findRoomNameById(id);
+        List<TimeCount> counts = roomRepository.findTimeCount(id, date);
+        int[] countArray = new int[10];
+
+        for (TimeCount count : counts) {
+            countArray[count.getTime() - 9] = count.getCount();
+        }
+        RoomTimeCountResponse response = RoomTimeCountResponse.builder()
+                .name(name)
+                .count(countArray)
+                .build();
+
+        return response;
     }
 }
 

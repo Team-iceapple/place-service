@@ -3,6 +3,7 @@ package iceapple.placeservice.repository.mock;
 import iceapple.placeservice.domain.Room;
 import iceapple.placeservice.dto.response.RoomTimeCountResponse;
 import iceapple.placeservice.repository.RoomRepository;
+import iceapple.placeservice.util.TimeCount;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,21 +36,31 @@ public class MockRoomRepository implements RoomRepository {
     }
 
     @Override
-    public RoomTimeCountResponse findById(final String id, final LocalDate date) {
-        Room room = store.get(id);
+    public List<TimeCount> findTimeCount(final String id, final LocalDate date) {
+        return List.of();
+    }
 
-        if (room == null) {
-            return null;
-        }
-        // 더미 count 데이터 생성 (테스트 목적)
-        List<Integer> dummyCount = Arrays.asList(1, 0, 2, 1, 3, 0, 0, 0, 0, 0);
+//    @Override
+//    public RoomTimeCountResponse findTimeCount(final String id, final LocalDate date) {
+//        Room room = store.get(id);
+//
+//        if (room == null) {
+//            return null;
+//        }
+//        // 더미 count 데이터 생성 (테스트 목적)
+//        List<Integer> dummyCount = Arrays.asList(1, 0, 2, 1, 3, 0, 0, 0, 0, 0);
+//
+//        RoomTimeCountResponse response = RoomTimeCountResponse.builder()
+//                .name(room.getName())
+//                .count(dummyCount)
+//                .build();
+//
+//        return response;
+//
+//    }
 
-        RoomTimeCountResponse response = RoomTimeCountResponse.builder()
-                .roomId(room.getId())
-                .name(room.getName())
-                .count(dummyCount)
-                .build();
-
-        return response;
+    @Override
+    public String findRoomNameById(final String id) {
+        return "";
     }
 }
