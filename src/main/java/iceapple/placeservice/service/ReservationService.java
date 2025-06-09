@@ -1,8 +1,16 @@
 package iceapple.placeservice.service;
 
+<<<<<<< HEAD
 import iceapple.placeservice.entity.Reservation;
+=======
+import iceapple.placeservice.dto.response.ReservationRoomResponse;
+import iceapple.placeservice.entity.Reservation;
+import iceapple.placeservice.entity.Room;
+>>>>>>> 525b061 (resolve #2 feat: jdbc repository 구현)
 import iceapple.placeservice.dto.request.ReservationRequest;
 import iceapple.placeservice.repository.ReservationRepository;
+import iceapple.placeservice.repository.jdbc.JdbcReservationRepository;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 
@@ -14,16 +22,33 @@ public class ReservationService {
     }
 
     public List<Reservation> searchReservationInfo(final String studentNumber, final String password) {
-        return reservationRepository.searchReservationInfo(studentNumber, password);
+        List<ReservationRoomResponse> reservations = reservationRepository.searchReservationInfo(studentNumber, password);
+        List<Reservation> result = new ArrayList<>();
+        System.out.println(reservations);
+        result.addAll(reservations);
+        for (Reservation res : reservations) {
+            String roomName = reservationRepository.findNameRoom(res.getRoomId());
+
+            Room room = new Room();
+            room.setId(res.getRoomId());
+            room.setName(roomName);
+
+            result.add(res);
+            System.out.println(result);
+        }
+        return result;
     }
 
-    public Reservation createReservation(final ReservationRequest request) {
+    public ResponseEntity<Void> createReservation(final ReservationRequest request) {
         return reservationRepository.createReservation(request);
     }
 
 
-    public ResponseEntity<String> cancelReservations(final List<String> ids) {
-        reservationRepository.cancelReservations(ids);
-        return ResponseEntity.ok("예약 취소 성공");
+    public ResponseEntity<Void> cancelReservations(final List<String> ids) {
+        int rows = reservationRepository.cancelReservations(ids);
+        if (ids.size() == rows) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

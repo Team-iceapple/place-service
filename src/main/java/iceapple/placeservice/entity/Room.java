@@ -12,9 +12,15 @@ public class Room {
 
     public Room() {}
 
+    public Room(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Room(final String id, final String name, final String description) {
         this.id = id;
         this.name = name;
         this.description = description;
     }
+
 }

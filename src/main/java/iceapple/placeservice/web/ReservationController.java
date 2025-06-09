@@ -1,5 +1,9 @@
 package iceapple.placeservice.web;
 
+<<<<<<< HEAD
+=======
+import com.fasterxml.jackson.databind.ObjectMapper;
+>>>>>>> 525b061 (resolve #2 feat: jdbc repository 구현)
 import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.request.ReservationInfoRequest;
 import iceapple.placeservice.dto.request.ReservationRequest;
@@ -39,7 +43,7 @@ public class ReservationController {
 
 
     @PostMapping()
-    public Reservation createReservation(@RequestBody final ReservationRequest request) {
+    public ResponseEntity<Void> createReservation(@RequestBody final ReservationRequest request) {
         //todo - 입력 정보 검증 과정 추가로 필요함
         try {
             return reservationService.createReservation(request);
@@ -50,13 +54,13 @@ public class ReservationController {
 
 
     @DeleteMapping()
-    public ResponseEntity<String> cancelReservations(@RequestBody final Map<String, List<String>> request) {
+    public ResponseEntity<Void> cancelReservations(@RequestBody final Map<String, List<String>> request) {
         System.out.println(request);
         try {
             List<String> ids = request.get("reservationId");
             return reservationService.cancelReservations(ids);
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
