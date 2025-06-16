@@ -1,11 +1,12 @@
 package iceapple.placeservice.repository;
 
-import iceapple.placeservice.domain.Room;
-import iceapple.placeservice.dto.response.RoomTimeCountResponse;
+import iceapple.placeservice.entity.Room;
+import iceapple.placeservice.util.TimeCount;
 import java.time.LocalDate;
 import java.util.List;
 
 public interface RoomRepository {
     List<Room> findAll();
-    RoomTimeCountResponse findById(String id, LocalDate date);
+    List<TimeCount> findTimeCount(String id, LocalDate date);
+    String findRoomNameById(String id);
 }
