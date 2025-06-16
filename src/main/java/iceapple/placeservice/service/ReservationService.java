@@ -1,12 +1,10 @@
 package iceapple.placeservice.service;
 
+import iceapple.placeservice.dto.RoomDTO;
 import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.response.ReservationRoomResponse;
-import iceapple.placeservice.entity.Reservation;
-import iceapple.placeservice.entity.Room;
 import iceapple.placeservice.dto.request.ReservationRequest;
 import iceapple.placeservice.repository.ReservationRepository;
-import iceapple.placeservice.repository.jdbc.JdbcReservationRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -18,20 +16,18 @@ public class ReservationService {
         this.reservationRepository = reservationRepository;
     }
 
-    public List<Reservation> searchReservationInfo(final String studentNumber, final String password) {
+    public List<ReservationRoomResponse> searchReservationInfo(final String studentNumber, final String password) {
         List<Reservation> reservations = reservationRepository.searchReservationInfo(studentNumber, password);
-        List<Reservation> result = new ArrayList<>();
-        System.out.println(reservations);
-        result.addAll(reservations);
+        List<ReservationRoomResponse> result = new ArrayList<>();
+
         for (Reservation res : reservations) {
-            String roomName = reservationRepository.findNameRoom(res.getRoomId());
+            String roomId = res.getRoomId();
+            String roomName = reservationRepository.findNameRoom(roomId);
 
-            Room room = new Room();
-            room.setId(res.getRoomId());
-            room.setName(roomName);
+            RoomDTO room = new RoomDTO(roomId, roomName);
 
-            result.add(res);
-            System.out.println(result);
+            ReservationRoomResponse response = new ReservationRoomResponse(res.getId(), res.getTimes(), res.getDate(), room);
+            result.add(response);
         }
         return result;
     }

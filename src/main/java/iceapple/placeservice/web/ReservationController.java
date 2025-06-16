@@ -1,6 +1,7 @@
 package iceapple.placeservice.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import iceapple.placeservice.dto.response.ReservationRoomResponse;
 import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.request.ReservationInfoRequest;
 import iceapple.placeservice.dto.request.ReservationRequest;
@@ -27,14 +28,13 @@ public class ReservationController {
 
     @PostMapping("/reservation-info")
     public ResponseEntity<?> reservationInfo(@RequestBody final ReservationInfoRequest request) {
-        System.out.println(request);
         if(request.getStudentNumber() == null || request.getStudentNumber().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("학번은 필수입니다.");
         }
         if(request.getPassword() == null || request.getPassword().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호는 필수입니다.");
         }
-        List<Reservation> response = reservationService.searchReservationInfo(request.getStudentNumber(), request.getPassword());
+        List<ReservationRoomResponse> response = reservationService.searchReservationInfo(request.getStudentNumber(), request.getPassword());
         return ResponseEntity.ok(response);
     }
 

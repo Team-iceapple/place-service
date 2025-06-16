@@ -58,21 +58,19 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public List<Reservation> searchReservationInfo(final String studentNumber, final String password) {
-        String sql = "SELECT id, times, date, room_id FROM reservation WHERE student_number = ? AND password = ?";
+        String sql = "SELECT * FROM reservation WHERE student_number = ? AND password = ?";
 
         return jdbcTemplate.query(sql, new Object[]{studentNumber, password}, (rs, rowNum) -> {
             String id = rs.getString("id");
-
+            String phoneNumber = rs.getString("phone_number");
             Array sqlArray = rs.getArray("times");
             Integer[] timesArray = (Integer[]) sqlArray.getArray();
             List<Integer> times = Arrays.asList(timesArray);
 
             LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
             String roomId = rs.getString("room_id");
-            Room room = new Room();
-            room.setId(roomId);
 
-            return new ReservationRoomResponse(id, times, date, room);
+            return new Reservation(id, studentNumber, phoneNumber, password, roomId, date, times);
         });
     }
 
