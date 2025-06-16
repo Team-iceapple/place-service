@@ -3,12 +3,6 @@ package iceapple.placeservice.config;
 import iceapple.placeservice.repository.ReservationRepository;
 import iceapple.placeservice.repository.jdbc.JdbcReservationRepository;
 import iceapple.placeservice.repository.jdbc.JdbcRoomRepository;
-<<<<<<< HEAD
-import iceapple.placeservice.repository.mock.MockReservationRepository;
-=======
-//import iceapple.placeservice.repository.mock.MockReservationRepository;
-import iceapple.placeservice.repository.mock.MockRoomRepository;
->>>>>>> 525b061 (resolve #2 feat: jdbc repository 구현)
 import iceapple.placeservice.repository.RoomRepository;
 import iceapple.placeservice.service.ReservationService;
 import iceapple.placeservice.service.RoomService;

@@ -1,9 +1,6 @@
 package iceapple.placeservice.web;
 
-<<<<<<< HEAD
-=======
 import com.fasterxml.jackson.databind.ObjectMapper;
->>>>>>> 525b061 (resolve #2 feat: jdbc repository 구현)
 import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.request.ReservationInfoRequest;
 import iceapple.placeservice.dto.request.ReservationRequest;

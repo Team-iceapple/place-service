@@ -1,12 +1,9 @@
 package iceapple.placeservice.service;
 
-<<<<<<< HEAD
 import iceapple.placeservice.entity.Reservation;
-=======
 import iceapple.placeservice.dto.response.ReservationRoomResponse;
 import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.entity.Room;
->>>>>>> 525b061 (resolve #2 feat: jdbc repository 구현)
 import iceapple.placeservice.dto.request.ReservationRequest;
 import iceapple.placeservice.repository.ReservationRepository;
 import iceapple.placeservice.repository.jdbc.JdbcReservationRepository;
@@ -22,7 +19,7 @@ public class ReservationService {
     }
 
     public List<Reservation> searchReservationInfo(final String studentNumber, final String password) {
-        List<ReservationRoomResponse> reservations = reservationRepository.searchReservationInfo(studentNumber, password);
+        List<Reservation> reservations = reservationRepository.searchReservationInfo(studentNumber, password);
         List<Reservation> result = new ArrayList<>();
         System.out.println(reservations);
         result.addAll(reservations);

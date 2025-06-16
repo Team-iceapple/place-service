@@ -8,41 +8,24 @@ import iceapple.placeservice.repository.ReservationRepository;
 import java.sql.Array;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-<<<<<<< HEAD
 import javax.sql.DataSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-public class JdbcReservationRepository implements ReservationRepository {
-
-    private JdbcTemplate jdbcTemplate;
-=======
 import java.util.UUID;
-import javax.sql.DataSource;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 
 public class JdbcReservationRepository implements ReservationRepository {
 
     private final JdbcTemplate jdbcTemplate;
->>>>>>> 525b061 (resolve #2 feat: jdbc repository 구현)
 
     public JdbcReservationRepository(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 525b061 (resolve #2 feat: jdbc repository 구현)
     @Override
     public ResponseEntity<Void> createReservation(final ReservationRequest request) {
         String sql = "INSERT INTO reservation (id, student_number, phone_number, password, room_id, date, times) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -66,15 +49,15 @@ public class JdbcReservationRepository implements ReservationRepository {
 //    @Override
 //    public List<Reservation> searchReservationInfo(final String studentNumber, final String password) {
 //        String sql = "SELECT id, times, date, room_id FROM reservation WHERE student_number = ? AND password = ?";
-////
-////        return jdbcTemplate.query(sql, new Object[]{studentNumber, password},
-////                (rs, rowNum) -> new ReservationRoomResponse(rs.getString("id"), rs.getArray("times"), rs.getTimestamp("date").toLocalDateTime().toLocalDate()));
+/// / /        return jdbcTemplate.query(sql, new Object[]{studentNumber, password}, /                (rs, rowNum)
+/// -> new ReservationRoomResponse(rs.getString("id"), rs.getArray("times"),
+/// rs.getTimestamp("date").toLocalDateTime().toLocalDate()));
 //        List<Reservation> reservations = new ArrayList<>();
 //        return reservations;
 //    };
 
     @Override
-    public List<ReservationRoomResponse> searchReservationInfo(final String studentNumber, final String password) {
+    public List<Reservation> searchReservationInfo(final String studentNumber, final String password) {
         String sql = "SELECT id, times, date, room_id FROM reservation WHERE student_number = ? AND password = ?";
 
         return jdbcTemplate.query(sql, new Object[]{studentNumber, password}, (rs, rowNum) -> {
