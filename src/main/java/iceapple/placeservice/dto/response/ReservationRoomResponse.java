@@ -20,7 +20,4 @@ public class ReservationRoomResponse {
         this.date = date;
         this.room = room;
     }
-
 }
-
-
