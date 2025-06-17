@@ -1,9 +1,9 @@
 package iceapple.placeservice.service;
 
-import iceapple.placeservice.dto.RoomDTO;
 import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.response.ReservationRoomResponse;
 import iceapple.placeservice.dto.request.ReservationRequest;
+import iceapple.placeservice.entity.Room;
 import iceapple.placeservice.repository.ReservationRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class ReservationService {
             String roomId = res.getRoomId();
             String roomName = reservationRepository.findNameRoom(roomId);
 
-            RoomDTO room = new RoomDTO(roomId, roomName);
+            Room room = new Room(roomId, roomName);
 
             ReservationRoomResponse response = new ReservationRoomResponse(res.getId(), res.getTimes(), res.getDate(), room);
             result.add(response);
