@@ -9,6 +9,7 @@ import iceapple.placeservice.service.RoomService;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class PlaceConfig {
@@ -34,8 +35,9 @@ public class PlaceConfig {
     }
 
     @Bean
-    public ReservationService reservationService() {
-        return new ReservationService(reservationRepository());
+    public ReservationService reservationService(PasswordEncoder passwordEncoder) {
+        return new ReservationService(reservationRepository(), passwordEncoder);
     }
+
 
 }
