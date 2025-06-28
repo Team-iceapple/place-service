@@ -14,4 +14,7 @@ public interface ReservationRepository{
     int cancelReservations(List<String> ids);
 
     String findNameRoom(String roomId);
+
+    List<Reservation> findByStudentNumber(String studentNumber);
+
 }

@@ -87,4 +87,24 @@ public class JdbcReservationRepository implements ReservationRepository {
         String sql = "SELECT name FROM room WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{roomId}, String.class);
     }
+
+    @Override
+    public List<Reservation> findByStudentNumber(final String studentNumber) {
+        String sql = "SELECT * FROM reservation WHERE student_number = ?";
+
+        return jdbcTemplate.query(sql, new Object[]{studentNumber}, (rs, rowNum) -> {
+            String id = rs.getString("id");
+            String phoneNumber = rs.getString("phone_number");
+            String encodedPassword = rs.getString("password");
+            String roomId = rs.getString("room_id");
+            LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
+
+            Array sqlArray = rs.getArray("times");
+            Integer[] timesArray = (Integer[]) sqlArray.getArray();
+            List<Integer> times = Arrays.asList(timesArray);
+
+            return new Reservation(id, studentNumber, phoneNumber, encodedPassword, roomId, date, times);
+        });
+    }
+
 }
