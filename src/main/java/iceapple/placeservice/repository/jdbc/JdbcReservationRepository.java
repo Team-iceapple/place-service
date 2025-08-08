@@ -28,7 +28,8 @@ public class JdbcReservationRepository implements ReservationRepository {
     public ResponseEntity<Void> createReservation(final ReservationRequest request) {
         String sql = "INSERT INTO reservation (id, student_number, phone_number, password, place_id, date, times) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        UUID id = UUID.randomUUID();
+        String id = String.format("r_%s", UUID.randomUUID().toString());
+
         jdbcTemplate.update(connection -> {
             PreparedStatement psmt = connection.prepareStatement(sql, new String[]{"id"});
             psmt.setString(1, id.toString());
