@@ -1,5 +1,6 @@
 package iceapple.placeservice.web;
 
+import iceapple.placeservice.dto.response.PlaceListResponse;
 import iceapple.placeservice.dto.response.PlaceTimeCountResponse;
 import iceapple.placeservice.entity.Place;
 import iceapple.placeservice.service.PlaceService;
@@ -21,8 +22,10 @@ public class PlaceController {
     private final PlaceService placeService;
 
     @GetMapping
-    public ResponseEntity<List<Place>> getPlaces() {
-        return ResponseEntity.ok(placeService.findPlaces());
+    public ResponseEntity<PlaceListResponse> getPlaces() {
+        List<Place> places = placeService.findPlaces();
+
+        return ResponseEntity.ok(new PlaceListResponse(places));
     }
 
     @GetMapping("/{place_id}")
