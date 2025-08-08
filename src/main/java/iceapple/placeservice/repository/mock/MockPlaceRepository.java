@@ -1,7 +1,7 @@
 package iceapple.placeservice.repository.mock;
 
-import iceapple.placeservice.entity.Room;
-import iceapple.placeservice.repository.RoomRepository;
+import iceapple.placeservice.entity.Place;
+import iceapple.placeservice.repository.PlaceRepository;
 import iceapple.placeservice.util.TimeCount;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,27 +9,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MockRoomRepository implements RoomRepository {
-    Map<String, Room> store = new HashMap<>();
+public class MockPlaceRepository implements PlaceRepository {
+    Map<String, Place> store = new HashMap<>();
 
-    public MockRoomRepository() {
+    public MockPlaceRepository() {
         // 테스트용 더미 데이터
-        Room room1 = new Room();
-        room1.setId("r_38485");
-        room1.setName("N5504");
-        room1.setDescription("4팀 예약 가능.");
+        Place place1 = new Place();
+        place1.setId("r_38485");
+        place1.setName("N5504");
+        place1.setDescription("4팀 예약 가능.");
 
-        Room room2 = new Room();
-        room2.setId("2_4494");
-        room2.setName("N5511");
-        room2.setDescription("티비가 있는 방입니다.");
+        Place place2 = new Place();
+        place2.setId("2_4494");
+        place2.setName("N5511");
+        place2.setDescription("티비가 있는 방입니다.");
 
-        store.put(room1.getId(), room1);
-        store.put(room2.getId(), room2);
+        store.put(place1.getId(), place1);
+        store.put(place2.getId(), place2);
     }
 
     @Override
-    public List<Room> findAll() {
+    public List<Place> findAll() {
         return new ArrayList<>(store.values());
     }
 
@@ -58,7 +58,7 @@ public class MockRoomRepository implements RoomRepository {
 //    }
 
     @Override
-    public String findRoomNameById(final String id) {
+    public String findPlaceNameById(final String id) {
         return "";
     }
 }

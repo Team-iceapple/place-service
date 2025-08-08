@@ -1,8 +1,6 @@
 package iceapple.placeservice.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import iceapple.placeservice.dto.response.ReservationRoomResponse;
-import iceapple.placeservice.entity.Reservation;
+import iceapple.placeservice.dto.response.ReservationPlaceResponse;
 import iceapple.placeservice.dto.request.ReservationInfoRequest;
 import iceapple.placeservice.dto.request.ReservationRequest;
 import iceapple.placeservice.service.ReservationService;
@@ -34,7 +32,7 @@ public class ReservationController {
         if(request.getPassword() == null || request.getPassword().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호는 필수입니다.");
         }
-        List<ReservationRoomResponse> response = reservationService.searchReservationInfo(request.getStudentNumber(), request.getPassword());
+        List<ReservationPlaceResponse> response = reservationService.searchReservationInfo(request.getStudentNumber(), request.getPassword());
         return ResponseEntity.ok(response);
     }
 

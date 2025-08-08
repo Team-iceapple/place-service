@@ -1,9 +1,9 @@
 package iceapple.placeservice.service;
 
+import iceapple.placeservice.entity.Place;
 import iceapple.placeservice.entity.Reservation;
-import iceapple.placeservice.dto.response.ReservationRoomResponse;
+import iceapple.placeservice.dto.response.ReservationPlaceResponse;
 import iceapple.placeservice.dto.request.ReservationRequest;
-import iceapple.placeservice.entity.Room;
 import iceapple.placeservice.repository.ReservationRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +20,10 @@ public class ReservationService {
         this.passwordEncoder = passwordEncoder; // 주입
     }
 
-    public List<ReservationRoomResponse> searchReservationInfo(final String studentNumber, final String inputPassword) {
+    public List<ReservationPlaceResponse> searchReservationInfo(final String studentNumber, final String inputPassword) {
         // 1. 비밀번호 없이 전체 예약 가져오기
         List<Reservation> reservations = reservationRepository.findByStudentNumber(studentNumber);
-        List<ReservationRoomResponse> result = new ArrayList<>();
+        List<ReservationPlaceResponse> result = new ArrayList<>();
 
         for (Reservation res : reservations) {
             // 2. 암호화된 비밀번호와 평문 비교
@@ -32,12 +32,12 @@ public class ReservationService {
             }
 
             // 3. 비밀번호 일치 → 응답 조립
-            String roomId = res.getRoomId();
-            String roomName = reservationRepository.findNameRoom(roomId);
-            Room room = new Room(roomId, roomName);
+            String placeId = res.getPlaceId();
+            String placeName = reservationRepository.findNamePlace(placeId);
+            Place place = new Place(placeId, placeName);
 
-            ReservationRoomResponse response = new ReservationRoomResponse(
-                    res.getId(), res.getTimes(), res.getDate(), room
+            ReservationPlaceResponse response = new ReservationPlaceResponse(
+                    res.getId(), res.getTimes(), res.getDate(), place
             );
             result.add(response);
         }

@@ -8,19 +8,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(Include.NON_NULL)
-public class Room {
+public class Place {
     private String id;
     private String name;
     private String description;
 
-    public Room() {}
+    public Place() {}
 
-    public Room(String id, String name) {
+    public Place(String id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public Room(final String id, final String name, final String description) {
+    public Place(final String id, final String name, final String description) {
         this.id = id;
         this.name = name;
         this.description = description;

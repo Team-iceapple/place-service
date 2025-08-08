@@ -1,12 +1,11 @@
 package iceapple.placeservice.dto.response;
 
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
 @Getter
-public class RoomTimeCountResponse {
+public class PlaceTimeCountResponse {
     private String name;
     private int[] count;
 }

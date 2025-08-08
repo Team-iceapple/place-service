@@ -2,8 +2,6 @@ package iceapple.placeservice.repository.jdbc;
 
 import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.request.ReservationRequest;
-import iceapple.placeservice.dto.response.ReservationRoomResponse;
-import iceapple.placeservice.entity.Room;
 import iceapple.placeservice.repository.ReservationRepository;
 import java.sql.Array;
 import java.sql.PreparedStatement;
@@ -28,7 +26,7 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public ResponseEntity<Void> createReservation(final ReservationRequest request) {
-        String sql = "INSERT INTO reservation (id, student_number, phone_number, password, room_id, date, times) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reservation (id, student_number, phone_number, password, place_id, date, times) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         UUID id = UUID.randomUUID();
         jdbcTemplate.update(connection -> {
@@ -37,7 +35,7 @@ public class JdbcReservationRepository implements ReservationRepository {
             psmt.setString(2, request.getStudentNumber());
             psmt.setString(3, request.getPhoneNumber());
             psmt.setString(4, request.getPassword());
-            psmt.setString(5, request.getRoomId());
+            psmt.setString(5, request.getPlaceId());
             psmt.setTimestamp(6, Timestamp.valueOf(request.getDate()));
             psmt.setObject(7, request.getTimes().toArray(new Integer[0]));
             return psmt;
@@ -68,9 +66,9 @@ public class JdbcReservationRepository implements ReservationRepository {
             List<Integer> times = Arrays.asList(timesArray);
 
             LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
-            String roomId = rs.getString("room_id");
+            String placeId = rs.getString("place_id");
 
-            return new Reservation(id, studentNumber, phoneNumber, password, roomId, date, times);
+            return new Reservation(id, studentNumber, phoneNumber, password, placeId, date, times);
         });
     }
 
@@ -83,9 +81,9 @@ public class JdbcReservationRepository implements ReservationRepository {
     }
 
     @Override
-    public String findNameRoom(final String roomId) {
-        String sql = "SELECT name FROM room WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{roomId}, String.class);
+    public String findNamePlace(final String placeId) {
+        String sql = "SELECT name FROM place WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{placeId}, String.class);
     }
 
     @Override
@@ -96,14 +94,14 @@ public class JdbcReservationRepository implements ReservationRepository {
             String id = rs.getString("id");
             String phoneNumber = rs.getString("phone_number");
             String encodedPassword = rs.getString("password");
-            String roomId = rs.getString("room_id");
+            String placeId = rs.getString("place_id");
             LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
 
             Array sqlArray = rs.getArray("times");
             Integer[] timesArray = (Integer[]) sqlArray.getArray();
             List<Integer> times = Arrays.asList(timesArray);
 
-            return new Reservation(id, studentNumber, phoneNumber, encodedPassword, roomId, date, times);
+            return new Reservation(id, studentNumber, phoneNumber, encodedPassword, placeId, date, times);
         });
     }
 

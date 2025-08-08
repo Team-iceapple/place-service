@@ -2,10 +2,10 @@ package iceapple.placeservice.config;
 
 import iceapple.placeservice.repository.ReservationRepository;
 import iceapple.placeservice.repository.jdbc.JdbcReservationRepository;
-import iceapple.placeservice.repository.jdbc.JdbcRoomRepository;
-import iceapple.placeservice.repository.RoomRepository;
+import iceapple.placeservice.repository.jdbc.JdbcPlaceRepository;
+import iceapple.placeservice.repository.PlaceRepository;
 import iceapple.placeservice.service.ReservationService;
-import iceapple.placeservice.service.RoomService;
+import iceapple.placeservice.service.PlaceService;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,13 +20,13 @@ public class PlaceConfig {
     }
 
     @Bean
-    public RoomRepository roomRepository() {
-        return new JdbcRoomRepository(dataSource);
+    public PlaceRepository roomRepository() {
+        return new JdbcPlaceRepository(dataSource);
     }
 
     @Bean
-    public RoomService roomService() {
-        return new RoomService(roomRepository());
+    public PlaceService roomService() {
+        return new PlaceService(roomRepository());
     }
 
     @Bean

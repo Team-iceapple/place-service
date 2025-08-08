@@ -13,7 +13,7 @@ public interface ReservationRepository{
 
     int cancelReservations(List<String> ids);
 
-    String findNameRoom(String roomId);
+    String findNamePlace(String placeId);
 
     List<Reservation> findByStudentNumber(String studentNumber);
 

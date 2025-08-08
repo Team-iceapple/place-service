@@ -12,7 +12,7 @@ public class Reservation {
     private String studentNumber;
     private String phoneNumber;
     private String password;
-    private String roomId;
+    private String placeId;
     private LocalDateTime date;
     private List<Integer> times;
 
@@ -22,7 +22,7 @@ public class Reservation {
         this.studentNumber = studentNumber;
         this.phoneNumber = phoneNumber;
         this.password = password;
-        this.roomId = roomId;
+        this.placeId = roomId;
         this.date = date;
         this.times = times;
     }

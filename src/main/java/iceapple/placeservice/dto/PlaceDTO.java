@@ -1,10 +1,10 @@
 package iceapple.placeservice.dto;
 
-public class RoomDTO {
+public class PlaceDTO {
     private String id;
     private String name;
 
-    public RoomDTO(String id, String name) {
+    public PlaceDTO(String id, String name) {
         this.id = id;
         this.name = name;
     }
