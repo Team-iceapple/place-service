@@ -26,12 +26,12 @@ public class ReservationRequest {
     }
 
     public ReservationRequest(final String studentNumber, final String phoneNumber, final String password,
-                              final String roomId, final LocalDateTime date,
+                              final String placeId, final LocalDateTime date,
                               final List<Integer> times) {
         this.studentNumber = studentNumber;
         this.phoneNumber = phoneNumber;
         this.password = password;
-        this.placeId = roomId;
+        this.placeId = placeId;
         this.date = date;
         this.times = times;
     }

@@ -12,12 +12,12 @@ public class ReservationPlaceResponse {
     private String id;
     private List<Integer> times;
     private LocalDateTime date;
-    private Place room;
+    private Place place;
 
-    public ReservationPlaceResponse(final String id, final List<Integer> times, final LocalDateTime date, final Place room) {
+    public ReservationPlaceResponse(final String id, final List<Integer> times, final LocalDateTime date, final Place place) {
         this.id = id;
         this.times = times;
         this.date = date;
-        this.room = room;
+        this.place = place;
     }
 }
