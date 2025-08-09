@@ -113,10 +113,8 @@ public class JdbcReservationRepository implements ReservationRepository {
     public List<ReservationSlot> deleteAndReturnSlots(final List<String> ids) {
         String sql = "DELETE FROM reservation WHERE id = ANY (?) RETURNING place_id, date, times";
 
-        System.out.println("ddjskjdk" +ids.size());
         return jdbcTemplate.query(
                 con -> {
-                    // DB 배열로 변환해서 ANY(?)에 넣음
                     PreparedStatement ps = con.prepareStatement(sql);
                     ps.setArray(1, con.createArrayOf("text", ids.toArray()));
                     return ps;
