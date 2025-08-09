@@ -3,6 +3,7 @@ package iceapple.placeservice.web;
 import iceapple.placeservice.dto.response.ReservationPlaceResponse;
 import iceapple.placeservice.dto.request.ReservationInfoRequest;
 import iceapple.placeservice.dto.request.ReservationRequest;
+import iceapple.placeservice.repository.ReservationRepository;
 import iceapple.placeservice.service.ReservationService;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationRepository reservationRepository;
 
     @PostMapping("/reservation-info")
     public ResponseEntity<?> reservationInfo(@RequestBody final ReservationInfoRequest request) {
@@ -49,9 +52,8 @@ public class ReservationController {
 
     @DeleteMapping()
     public ResponseEntity<Void> cancelReservations(@RequestBody final Map<String, List<String>> request) {
-        System.out.println(request);
         try {
-            List<String> ids = request.get("reservationId");
+            List<String> ids = request.get("reservation_id");
             return reservationService.cancelReservations(ids);
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());

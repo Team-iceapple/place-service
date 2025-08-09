@@ -1,5 +1,6 @@
 package iceapple.placeservice.repository;
 
+import iceapple.placeservice.dto.ReservationSlot;
 import iceapple.placeservice.dto.request.ReservationRequest;
 import iceapple.placeservice.entity.Reservation;
 import java.util.List;
@@ -16,5 +17,7 @@ public interface ReservationRepository{
     String findNamePlace(String placeId);
 
     List<Reservation> findByStudentNumber(String studentNumber);
+
+    List<ReservationSlot> deleteAndReturnSlots(List<String> ids);
 
 }

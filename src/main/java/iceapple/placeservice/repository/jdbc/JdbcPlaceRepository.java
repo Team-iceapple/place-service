@@ -37,6 +37,34 @@ public class JdbcPlaceRepository implements PlaceRepository {
         return jdbcTemplate.queryForObject(sql, new Object[]{placeId}, String.class);
     }
 
+    @Override
+    public void increaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times) {
+        final String sql =
+                "INSERT INTO time_count (place_id, date, time, count) " +
+                        "VALUES (?, ?, ?, 1) " +
+                        "ON CONFLICT (place_id, date, time) DO UPDATE " +
+                        "SET count = time_count.count + 1";
+
+        jdbcTemplate.batchUpdate(sql, times, times.size(), (ps, t) -> {
+            ps.setString(1, placeId);
+            ps.setDate(2, java.sql.Date.valueOf(date));
+            ps.setInt(3, t);
+        });
+    }
+
+    @Override
+    public void decreaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times) {
+        final String sql =
+                "UPDATE time_count SET count = GREATEST(count - 1, 0) " +
+                        "WHERE place_id = ? AND date = ? AND time = ?";
+
+        jdbcTemplate.batchUpdate(sql, times, times.size(), (ps, t) -> {
+            ps.setString(1, placeId);
+            ps.setDate(2, java.sql.Date.valueOf(date));
+            ps.setInt(3, t);
+        });
+    }
+
 
     private RowMapper<Place> rowMapper() {
         return (rs, rowNum) -> new Place(

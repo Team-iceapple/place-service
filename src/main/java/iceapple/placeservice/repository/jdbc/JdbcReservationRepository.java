@@ -1,12 +1,15 @@
 package iceapple.placeservice.repository.jdbc;
 
+import iceapple.placeservice.dto.ReservationSlot;
 import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.request.ReservationRequest;
 import iceapple.placeservice.repository.ReservationRepository;
 import java.sql.Array;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
@@ -104,6 +107,32 @@ public class JdbcReservationRepository implements ReservationRepository {
 
             return new Reservation(id, studentNumber, phoneNumber, encodedPassword, placeId, date, times);
         });
+    }
+
+    @Override
+    public List<ReservationSlot> deleteAndReturnSlots(final List<String> ids) {
+        String sql = "DELETE FROM reservation WHERE id = ANY (?) RETURNING place_id, date, times";
+
+        System.out.println("ddjskjdk" +ids.size());
+        return jdbcTemplate.query(
+                con -> {
+                    // DB 배열로 변환해서 ANY(?)에 넣음
+                    PreparedStatement ps = con.prepareStatement(sql);
+                    ps.setArray(1, con.createArrayOf("text", ids.toArray()));
+                    return ps;
+                },
+                (rs) -> {
+                    List<ReservationSlot> result = new ArrayList<>();
+                    while (rs.next()) {
+                        String placeId = rs.getString("place_id");
+                        LocalDate date = rs.getTimestamp("date").toLocalDateTime().toLocalDate();
+                        Integer[] timesArr = (Integer[]) rs.getArray("times").getArray();
+
+                        result.add(new ReservationSlot(placeId, date, Arrays.asList(timesArr)));
+                    }
+                    return result;
+                }
+        );
     }
 
 }
