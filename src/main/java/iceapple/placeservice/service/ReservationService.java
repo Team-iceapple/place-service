@@ -63,8 +63,6 @@ public class ReservationService {
                 request.getTimes()
         );
 
-        ResponseEntity<Void> response = reservationRepository.createReservation(toSave);
-
         // time count 증가
         placeRepository.increaseTimeCount(
                 request.getPlaceId(),
@@ -72,8 +70,10 @@ public class ReservationService {
                 request.getTimes()
         );
 
-        return response;
+        return reservationRepository.createReservation(toSave);
     }
+
+
 
     @Transactional
     public ResponseEntity<Void> cancelReservations(final List<String> ids) {
@@ -87,6 +87,6 @@ public class ReservationService {
         for (ReservationSlot s : slots) {
             placeRepository.decreaseTimeCount(s.placeId(), s.date(), s.times());
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 }
