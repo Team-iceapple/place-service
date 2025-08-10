@@ -1,22 +1,27 @@
 package iceapple.placeservice.service;
 
+import iceapple.placeservice.dto.ReservationSlot;
 import iceapple.placeservice.entity.Place;
 import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.response.ReservationPlaceResponse;
 import iceapple.placeservice.dto.request.ReservationRequest;
+import iceapple.placeservice.repository.PlaceRepository;
 import iceapple.placeservice.repository.ReservationRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 
 public class ReservationService {
     private final ReservationRepository reservationRepository;
+    private final PlaceRepository placeRepository;
     private final PasswordEncoder passwordEncoder; // 추가
 
-    public ReservationService(ReservationRepository reservationRepository, PasswordEncoder passwordEncoder) {
+    public ReservationService(ReservationRepository reservationRepository, PlaceRepository placeRepository, PasswordEncoder passwordEncoder) {
         this.reservationRepository = reservationRepository;
+        this.placeRepository = placeRepository;
         this.passwordEncoder = passwordEncoder; // 주입
     }
 
@@ -45,19 +50,43 @@ public class ReservationService {
         return result;
     }
 
+    @Transactional
     public ResponseEntity<Void> createReservation(final ReservationRequest request) {
         // 비밀번호 암호화 추가
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        request.setPassword(encodedPassword);
+        ReservationRequest toSave = new ReservationRequest(
+                request.getStudentNumber(),
+                request.getPhoneNumber(),
+                encodedPassword,
+                request.getPlaceId(),
+                request.getDate(),
+                request.getTimes()
+        );
 
-        return reservationRepository.createReservation(request);
+        // time count 증가
+        placeRepository.increaseTimeCount(
+                request.getPlaceId(),
+                request.getDate().toLocalDate(),
+                request.getTimes()
+        );
+
+        return reservationRepository.createReservation(toSave);
     }
 
+
+
+    @Transactional
     public ResponseEntity<Void> cancelReservations(final List<String> ids) {
-        int rows = reservationRepository.cancelReservations(ids);
-        if (ids.size() == rows) {
-            return ResponseEntity.noContent().build();
+        List<ReservationSlot> slots = reservationRepository.deleteAndReturnSlots(ids);
+
+        // slot 개수 = ids.size 비교
+        if (slots.size() != ids.size()) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+
+        for (ReservationSlot s : slots) {
+            placeRepository.decreaseTimeCount(s.placeId(), s.date(), s.times());
+        }
+        return ResponseEntity.noContent().build();
     }
 }

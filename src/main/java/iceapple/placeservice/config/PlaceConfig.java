@@ -20,13 +20,13 @@ public class PlaceConfig {
     }
 
     @Bean
-    public PlaceRepository roomRepository() {
+    public PlaceRepository placeRepository() {
         return new JdbcPlaceRepository(dataSource);
     }
 
     @Bean
-    public PlaceService roomService() {
-        return new PlaceService(roomRepository());
+    public PlaceService placeServiceService() {
+        return new PlaceService(placeRepository());
     }
 
     @Bean
@@ -36,8 +36,6 @@ public class PlaceConfig {
 
     @Bean
     public ReservationService reservationService(PasswordEncoder passwordEncoder) {
-        return new ReservationService(reservationRepository(), passwordEncoder);
+        return new ReservationService(reservationRepository(),placeRepository(), passwordEncoder);
     }
-
-
 }

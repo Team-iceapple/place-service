@@ -25,7 +25,12 @@ public class PlaceService {
         int[] countArray = new int[10];
 
         for (TimeCount count : counts) {
-            countArray[count.getTime() - 9] = count.getCount();
+            int t = count.getTime();
+            int idx = t-9;
+            if (idx < 0 || idx > 10) {
+                continue;
+            }
+            countArray[idx] = count.getCount();
         }
         PlaceTimeCountResponse response = PlaceTimeCountResponse.builder()
                 .name(name)

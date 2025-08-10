@@ -61,4 +61,19 @@ public class MockPlaceRepository implements PlaceRepository {
     public String findPlaceNameById(final String id) {
         return "";
     }
+
+    @Override
+    public Integer findPlaceCountById(final String id) {
+        return 0;
+    }
+
+    @Override
+    public void increaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times) {
+
+    }
+
+    @Override
+    public void decreaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times) {
+
+    }
 }
