@@ -1,6 +1,7 @@
 package iceapple.placeservice.repository.jdbc;
 
 import iceapple.placeservice.dto.ReservationSlot;
+import iceapple.placeservice.dto.request.AdminReservationRequest;
 import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.request.ReservationRequest;
 import iceapple.placeservice.repository.ReservationRepository;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.RowMapper;
 
 
 public class JdbcReservationRepository implements ReservationRepository {
@@ -48,16 +50,42 @@ public class JdbcReservationRepository implements ReservationRepository {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Override
+    public ResponseEntity<Void> updateReservationInfo(final String reservationId,
+                                                      final AdminReservationRequest request) {
+
+        String sql = " UPDATE reservation SET date = ?,times = ? WHERE id = ?";
+
+        int updated = jdbcTemplate.update(connection -> {
+            var ps = connection.prepareStatement(sql);
+
+            Integer[] times = request.getTimes().toArray(new Integer[0]);
+            Array sqlArray = connection.createArrayOf("integer", times);
+
+            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setArray(2, sqlArray);
+            ps.setString(3, reservationId);
+            return ps;
+        });
+
+        if (updated == 0) {
+            System.out.println("아무것도 안됨");
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
 //    @Override
 //    public List<Reservation> searchReservationInfo(final String studentNumber, final String password) {
 //        String sql = "SELECT id, times, date, room_id FROM reservation WHERE student_number = ? AND password = ?";
-/// / /        return jdbcTemplate.query(sql, new Object[]{studentNumber, password}, /                (rs, rowNum)
-/// -> new ReservationRoomResponse(rs.getString("id"), rs.getArray("times"),
-/// rs.getTimestamp("date").toLocalDateTime().toLocalDate()));
+
+    /// / /        return jdbcTemplate.query(sql, new Object[]{studentNumber, password}, /                (rs, rowNum)
+    /// -> new ReservationRoomResponse(rs.getString("id"), rs.getArray("times"),
+    /// rs.getTimestamp("date").toLocalDateTime().toLocalDate()));
 //        List<Reservation> reservations = new ArrayList<>();
 //        return reservations;
 //    };
-
     @Override
     public List<Reservation> searchReservationInfo(final String studentNumber, final String password) {
         String sql = "SELECT * FROM reservation WHERE student_number = ? AND password = ?";
@@ -77,7 +105,7 @@ public class JdbcReservationRepository implements ReservationRepository {
     }
 
     @Override
-    public int cancelReservations(final List<String> ids){
+    public int cancelReservations(final List<String> ids) {
         String sql = "DELETE FROM reservation WHERE id = ?";
         return ids.stream()
                 .mapToInt(id -> jdbcTemplate.update(sql, id))
@@ -94,20 +122,24 @@ public class JdbcReservationRepository implements ReservationRepository {
     public List<Reservation> findByStudentNumber(final String studentNumber) {
         String sql = "SELECT * FROM reservation WHERE student_number = ?";
 
-        return jdbcTemplate.query(sql, new Object[]{studentNumber}, (rs, rowNum) -> {
-            String id = rs.getString("id");
-            String phoneNumber = rs.getString("phone_number");
-            String encodedPassword = rs.getString("password");
-            String placeId = rs.getString("place_id");
-            LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
+        return jdbcTemplate.query(sql, new Object[]{studentNumber}, rowMapper());
 
-            Array sqlArray = rs.getArray("times");
-            Integer[] timesArray = (Integer[]) sqlArray.getArray();
-            List<Integer> times = Arrays.asList(timesArray);
-
-            return new Reservation(id, studentNumber, phoneNumber, encodedPassword, placeId, date, times);
-        });
     }
+
+    @Override
+    public List<Reservation> findByReservationDate(final LocalDate date) {
+        String sql = "SELECT * FROM reservation WHERE date = ?";
+
+        return jdbcTemplate.query(sql, new Object[]{date}, rowMapper());
+    }
+
+    @Override
+    public Reservation findByReservationId(final String reservationId) {
+        String sql = "SELECT * FROM reservation WHERE id = ?";
+
+        return jdbcTemplate.queryForObject(sql, rowMapper(), reservationId);
+    }
+
 
     @Override
     public List<ReservationSlot> deleteAndReturnSlots(final List<String> ids) {
@@ -133,4 +165,24 @@ public class JdbcReservationRepository implements ReservationRepository {
         );
     }
 
+    private RowMapper<Reservation> rowMapper() {
+
+        return (rs, rowNum) -> {
+            Array sqlArray = rs.getArray("times");
+            Integer[] timesArray = (Integer[]) sqlArray.getArray();
+            List<Integer> times = Arrays.asList(timesArray);
+
+            LocalDateTime dateTime = rs.getTimestamp("date").toLocalDateTime();
+
+            return new Reservation(
+                    rs.getString("id"),
+                    rs.getString("student_number"),
+                    rs.getString("phone_number"),
+                    rs.getString("password"),
+                    rs.getString("place_id"),
+                    dateTime,
+                    times
+            );
+        };
+    }
 }
