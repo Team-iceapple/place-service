@@ -29,13 +29,14 @@ public class ReservationController {
 
     @PostMapping("/reservation-info")
     public ResponseEntity<?> reservationInfo(@RequestBody final ReservationInfoRequest request) {
-        if(request.getStudentNumber() == null || request.getStudentNumber().isBlank()) {
+        if (request.getStudentNumber() == null || request.getStudentNumber().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("학번은 필수입니다.");
         }
-        if(request.getPassword() == null || request.getPassword().isBlank()) {
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호는 필수입니다.");
         }
-        List<ReservationPlaceResponse> response = reservationService.searchReservationInfo(request.getStudentNumber(), request.getPassword());
+        List<ReservationPlaceResponse> response = reservationService.searchReservationInfo(request.getStudentNumber(),
+                request.getPassword());
         return ResponseEntity.ok(response);
     }
 
@@ -45,6 +46,7 @@ public class ReservationController {
         try {
             return reservationService.createReservation(request);
         } catch (IllegalStateException e) {
+            System.out.println("createReservation" + e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
