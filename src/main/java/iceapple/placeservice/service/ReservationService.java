@@ -58,6 +58,7 @@ public class ReservationService {
     @Transactional
     public ResponseEntity<Void> createReservation(final ReservationRequest request) {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
+        System.out.println(request.getDate());
         ReservationRequest toSave = new ReservationRequest(
                 request.getStudentNumber(),
                 request.getPhoneNumber(),
@@ -69,7 +70,7 @@ public class ReservationService {
 
         placeRepository.increaseTimeCount(
                 request.getPlaceId(),
-                request.getDate().toLocalDate(),
+                LocalDate.from(request.getDate()),
                 request.getTimes()
         );
 
@@ -94,7 +95,6 @@ public class ReservationService {
 
     @Transactional
     public ResponseEntity<Void> adminCreateReservation(final AdminReservationRequest request) {
-
         String encodedPassword = passwordEncoder.encode("admin");
 
         ReservationRequest toSave = new ReservationRequest(
@@ -140,6 +140,7 @@ public class ReservationService {
     }
 
 
+    @Transactional
     public void updateAdminReservation(String reservationId, AdminReservationRequest request) {
         Reservation reservation = reservationRepository.findByReservationId(reservationId);
 

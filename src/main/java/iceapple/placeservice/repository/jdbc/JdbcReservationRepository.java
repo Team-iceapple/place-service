@@ -6,6 +6,7 @@ import iceapple.placeservice.entity.Reservation;
 import iceapple.placeservice.dto.request.ReservationRequest;
 import iceapple.placeservice.repository.ReservationRepository;
 import java.sql.Array;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -62,14 +63,13 @@ public class JdbcReservationRepository implements ReservationRepository {
             Integer[] times = request.getTimes().toArray(new Integer[0]);
             Array sqlArray = connection.createArrayOf("integer", times);
 
-            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setDate(1, Date.valueOf(request.getDate()));
             ps.setArray(2, sqlArray);
             ps.setString(3, reservationId);
             return ps;
         });
 
         if (updated == 0) {
-            System.out.println("아무것도 안됨");
             return ResponseEntity.notFound().build();
         }
 
