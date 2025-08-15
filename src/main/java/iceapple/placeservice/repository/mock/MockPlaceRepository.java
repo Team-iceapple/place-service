@@ -4,10 +4,7 @@ import iceapple.placeservice.entity.Place;
 import iceapple.placeservice.repository.PlaceRepository;
 import iceapple.placeservice.util.TimeCount;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MockPlaceRepository implements PlaceRepository {
     Map<String, Place> store = new HashMap<>();
@@ -75,5 +72,25 @@ public class MockPlaceRepository implements PlaceRepository {
     @Override
     public void decreaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times) {
 
+    }
+
+    @Override
+    public void insert(Place place, Integer placeCount) {
+
+    }
+
+    @Override
+    public void deleteById(String id) {
+
+    }
+
+    @Override
+    public boolean existsById(String id) {
+        return false;
+    }
+
+    @Override
+    public Optional<Place> findById(String id) {
+        return Optional.empty();
     }
 }

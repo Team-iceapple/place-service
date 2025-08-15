@@ -6,6 +6,8 @@ import iceapple.placeservice.repository.PlaceRepository;
 import iceapple.placeservice.util.TimeCount;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 public class PlaceService {
 
@@ -38,6 +40,27 @@ public class PlaceService {
                 .build();
 
         return response;
+    }
+
+    // 관리자용 등록
+    public Place createPlace(String name, String description, Integer placeCount) {
+        String id = UUID.randomUUID().toString();
+        Place place = new Place(id, name, description);
+        placeRepository.insert(place, placeCount);
+        return place;
+    }
+
+    // 관리자용 삭제
+    public void deletePlace(String placeId) {
+        if (!placeRepository.existsById(placeId)) {
+            throw new IllegalArgumentException("존재하지 않는 회의실입니다: " + placeId);
+        }
+        placeRepository.deleteById(placeId);
+    }
+
+    public Place adminGetPlace(String placeId) {
+        return placeRepository.findById(placeId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회의실입니다: " + placeId));
     }
 }
 

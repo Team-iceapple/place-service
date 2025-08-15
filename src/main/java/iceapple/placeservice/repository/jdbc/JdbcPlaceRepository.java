@@ -6,6 +6,7 @@ import iceapple.placeservice.util.TimeCount;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -93,4 +94,36 @@ public class JdbcPlaceRepository implements PlaceRepository {
                 rs.getString("description")
         );
     }
+
+    @Override
+    public Optional<Place> findById(String id) {
+        String sql = "SELECT id, name, description FROM place WHERE id = ?";
+        return jdbcTemplate.query(sql, new Object[]{id}, rowMapper())
+                .stream().findFirst();
+    }
+
+    @Override
+    public boolean existsById(String id) {
+        String sql = "SELECT COUNT(1) FROM place WHERE id = ?";
+        Integer cnt = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        return cnt != null && cnt > 0;
+    }
+
+    @Override
+    public void insert(Place place, Integer placeCount) {
+        if (placeCount != null) {
+            String sql = "INSERT INTO place (id, name, description, place_count) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sql, place.getId(), place.getName(), place.getDescription(), placeCount);
+        } else {
+            String sql = "INSERT INTO place (id, name, description) VALUES (?, ?, ?)";
+            jdbcTemplate.update(sql, place.getId(), place.getName(), place.getDescription());
+        }
+    }
+
+    @Override
+    public void deleteById(String id) {
+        String sql = "DELETE FROM place WHERE id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
 }
