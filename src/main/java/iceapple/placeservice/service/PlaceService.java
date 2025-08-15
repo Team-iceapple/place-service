@@ -44,7 +44,7 @@ public class PlaceService {
 
     // 관리자용 등록
     public Place createPlace(String name, String description, Integer placeCount) {
-        String id = UUID.randomUUID().toString();
+        String id = "p_" + UUID.randomUUID().toString();   // ★ p_ + UUID
         Place place = new Place(id, name, description);
         placeRepository.insert(place, placeCount);
         return place;
