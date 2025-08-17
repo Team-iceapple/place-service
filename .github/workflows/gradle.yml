@@ -241,26 +241,23 @@ jobs:
             [ -n \"\$JAR_ON_SERVER\" ] || { echo \"❌ no jar in \$RELEASES\"; exit 1; }
             echo \"최신 JAR: \$JAR_ON_SERVER\"
       
-            # 기존 프로세스 종료
+             
+            # 실행 중 프로세스 종료 (없으면 무시)
             if [ -f \"\$PID_FILE\" ] && ps -p \$(cat \"\$PID_FILE\") >/dev/null 2>&1; then
               kill \$(cat \"\$PID_FILE\") || true
               sleep 3
-              if ps -p \$(cat \"\$PID_FILE\") >/dev/null 2>&1 then
-                kill -9 \$(cat \"\$PID_FILE\") || true
-              fi
+              ps -p \$(cat \"\$PID_FILE\") >/dev/null 2>&1 && kill -9 \$(cat \"\$PID_FILE\") || true
               rm -f \"\$PID_FILE\"
             else
-              # JAR 파일명 기준으로 매칭을 좁히면 더 안전
-              APP_BASENAME="$(basename "$JAR_ON_SERVER")"
-              PIDS="$(pgrep -f "$APP_BASENAME" || true)"
-              if [ -n "$PIDS" ]; then
-                kill $PIDS || true
+              PIDS=\$(pgrep -f \"java .*place-service\" || true)
+              if [ -n \"\$PIDS\" ]; then
+                kill \$PIDS || true
                 sleep 3
-                PIDS="$(pgrep -f "$APP_BASENAME" || true)"
-                [ -n "$PIDS" ] && kill -9 $PIDS || true
+                PIDS=\$(pgrep -f \"java .*place-service\" || true)
+                [ -n \"\$PIDS\" ] && kill -9 \$PIDS || true
               fi
             fi
-      
+            
             # 로그 파일 경로 쓰기 가능 확인
             touch \"\$LOG_FILE\" && chmod 664 \"\$LOG_FILE\"
       
