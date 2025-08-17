@@ -13,7 +13,8 @@ public class Place {
     private String name;
     private String description;
 
-    public Place() {}
+    public Place() {
+    }
 
     public Place(String id, String name) {
         this.id = id;
