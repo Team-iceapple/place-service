@@ -141,6 +141,13 @@ jobs:
             PIDS='"$PIDS"'
             LOG_FILE='"$LOG_FILE"'
             PID_FILE='"$PID_FILE"'
+
+            command -v java >/dev/null || { echo \"❌ java not found in PATH: \$PATH\"; exit 127; }
+            java -version
+      
+            test -f \"\$SHARED/application.properties\" || { echo \"❌ missing \$SHARED/application.properties\"; exit 1; }
+            test -f \"\$SHARED/application-db.properties\" || { echo \"❌ missing \$SHARED/application-db.properties\"; exit 1; }
+
       
             JAR_ON_SERVER=\$(ls -t \"\$RELEASES\"/*.jar | head -n 1)
             if [ -z \"\$JAR_ON_SERVER\" ]; then
