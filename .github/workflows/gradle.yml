@@ -272,7 +272,6 @@ jobs:
               exit 1
             fi
           "'
-           '"
           
   dependency-submission:
     runs-on: ubuntu-latest
