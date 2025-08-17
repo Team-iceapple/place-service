@@ -97,34 +97,57 @@ jobs:
         run: scp "${{ steps.pick.outputs.jar_file }}" iceapple:/home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service/releases/
 
       - name: 타깃 서버 배포 실행
+        shell: bash
         run: |
+          set -Eeuo pipefail
+      
+          APP_DIR="/home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service"
+          RELEASES="$APP_DIR/releases"
+          SHARED="$APP_DIR/shared"
+          LOGS="$APP_DIR/logs"
+          PIDS="$APP_DIR/pids"
+          LOG_FILE="$LOGS/place-service.log"
+          PID_FILE="$PIDS/app.pid"
+      
+          # 0) 원격 디렉토리 보장
+          ssh iceapple "mkdir -p '$RELEASES' '$SHARED' '$LOGS' '$PIDS'"
+      
+          # 1) (로컬) 설정파일 생성
+          TMPDIR="$(mktemp -d)"; trap 'rm -rf "$TMPDIR"' EXIT
+      
+          cat > "$TMPDIR/application.properties" <<'EOF_APP'
+          ${{ secrets.APPLICATION_PROD_PROPERTIES }}
+          EOF_APP
+      
+          cat > "$TMPDIR/application-db.properties" <<'EOF_DB'
+          ${{ secrets.APPLICATION_DB_PROD_PROPERTIES }}
+          EOF_DB
+      
+          # 윈도우 개행 방지
+          sed -i 's/\r$//' "$TMPDIR"/application*.properties
+      
+          # 2) (로컬→원격) shared/ 로 복사 + 권한
+          scp "$TMPDIR/application.properties"        iceapple:"$SHARED/application.properties"
+          scp "$TMPDIR/application-db.properties"     iceapple:"$SHARED/application-db.properties"
+          ssh iceapple "chmod 600 '$SHARED/application.properties' '$SHARED/application-db.properties'"
+      
+          # 3) (원격) 최신 JAR 확인, 재시작
           ssh iceapple 'bash -lc "
             set -Eeuo pipefail
-            APP_DIR=/home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service
-            RELEASES=\$APP_DIR/releases
-            SHARED=\$APP_DIR/shared
-            LOGS=\$APP_DIR/logs
-            PIDS=\$APP_DIR/pids
-            LOG_FILE=\$LOGS/place-service.log
-            PID_FILE=\$PIDS/app.pid
-
-            mkdir -p \"\$RELEASES\" \"\$SHARED\" \"\$LOGS\" \"\$PIDS\"
-
-            # 최신 JAR 선택
+            APP_DIR='"$APP_DIR"'
+            RELEASES='"$RELEASES"'
+            SHARED='"$SHARED"'
+            LOGS='"$LOGS"'
+            PIDS='"$PIDS"'
+            LOG_FILE='"$LOG_FILE"'
+            PID_FILE='"$PID_FILE"'
+      
             JAR_ON_SERVER=\$(ls -t \"\$RELEASES\"/*.jar | head -n 1)
+            if [ -z \"\$JAR_ON_SERVER\" ]; then
+              echo \"❌ releases 디렉토리에 JAR가 없습니다\"; exit 1
+            fi
             echo \"최신 JAR: \$JAR_ON_SERVER\"
-
-            # 외부 설정 파일 작성
-            cat > \"\$SHARED/application.properties\" <<'EOF_APP'
-            ${{ secrets.APPLICATION_PROD_PROPERTIES }}
-            EOF_APP
-            chmod 600 \"\$SHARED/application.properties\"
-            
-            cat > \"\$SHARED/application-db.properties\" <<'EOF_DB'
-            ${{ secrets.APPLICATION_DB_PROD_PROPERTIES }}
-            EOF_DB
-            chmod 600 \"\$SHARED/application-db.properties\"
-
+      
             # 기존 프로세스 종료
             if [ -f \"\$PID_FILE\" ] && ps -p \$(cat \"\$PID_FILE\") >/dev/null 2>&1; then
               kill \$(cat \"\$PID_FILE\") || true
@@ -136,18 +159,22 @@ jobs:
               sleep 5
               pgrep -f \"java .*place-service\" | xargs -r kill -9 || true
             fi
-
+      
             # 새 프로세스 시작
-            echo '새 프로세스 시작...'
+            echo \"새 프로세스 시작...\"
             nohup java -jar \"\$JAR_ON_SERVER\" \
               --spring.config.location=\"\$SHARED/application.properties,\$SHARED/application-db.properties\" \
               >> \"\$LOG_FILE\" 2>&1 &
-
-            echo \$! > \"\$PID_FILE\"
-            echo \"PID: \$(cat \"\$PID_FILE\")\"
-            echo \"로그 위치: \$LOG_FILE\"
+      
+            pid=\$!
+            if [ -n \"\$pid\" ]; then
+              echo \"\$pid\" > \"\$PID_FILE\"
+              echo \"PID: \$(cat \"\$PID_FILE\")\"
+              echo \"로그 위치: \$LOG_FILE\"
+            else
+              echo \"❌ PID 수집 실패\"; exit 1
+            fi
           "'
-
   dependency-submission:
     runs-on: ubuntu-latest
     permissions:
