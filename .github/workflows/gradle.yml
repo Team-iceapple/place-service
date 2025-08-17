@@ -125,28 +125,28 @@ jobs:
             EOF_DB
             chmod 600 \"\$SHARED/application-db.properties\"
 
-          #   # 기존 프로세스 종료
-          #   if [ -f \"\$PID_FILE\" ] && ps -p \$(cat \"\$PID_FILE\") >/dev/null 2>&1; then
-          #     kill \$(cat \"\$PID_FILE\") || true
-          #     sleep 5
-          #     ps -p \$(cat \"\$PID_FILE\") >/dev/null 2>&1 && kill -9 \$(cat \"\$PID_FILE\") || true
-          #     rm -f \"\$PID_FILE\"
-          #   else
-          #     pgrep -f \"java .*place-service\" | xargs -r kill || true
-          #     sleep 5
-          #     pgrep -f \"java .*place-service\" | xargs -r kill -9 || true
-          #   fi
+            # 기존 프로세스 종료
+            if [ -f \"\$PID_FILE\" ] && ps -p \$(cat \"\$PID_FILE\") >/dev/null 2>&1; then
+              kill \$(cat \"\$PID_FILE\") || true
+              sleep 5
+              ps -p \$(cat \"\$PID_FILE\") >/dev/null 2>&1 && kill -9 \$(cat \"\$PID_FILE\") || true
+              rm -f \"\$PID_FILE\"
+            else
+              pgrep -f \"java .*place-service\" | xargs -r kill || true
+              sleep 5
+              pgrep -f \"java .*place-service\" | xargs -r kill -9 || true
+            fi
 
-          #   # 새 프로세스 시작
-          #   echo '새 프로세스 시작...'
-          #   nohup java -jar \"\$JAR_ON_SERVER\" \
-          #     --spring.config.location=\"\$SHARED/application.properties,\$SHARED/application-db.properties\" \
-          #     >> \"\$LOG_FILE\" 2>&1 &
+            # 새 프로세스 시작
+            echo '새 프로세스 시작...'
+            nohup java -jar \"\$JAR_ON_SERVER\" \
+              --spring.config.location=\"\$SHARED/application.properties,\$SHARED/application-db.properties\" \
+              >> \"\$LOG_FILE\" 2>&1 &
 
-          #   echo \$! > \"\$PID_FILE\"
-          #   echo \"PID: \$(cat \"\$PID_FILE\")\"
-          #   echo \"로그 위치: \$LOG_FILE\"
-          # "'
+            echo \$! > \"\$PID_FILE\"
+            echo \"PID: \$(cat \"\$PID_FILE\")\"
+            echo \"로그 위치: \$LOG_FILE\"
+          "'
 
   dependency-submission:
     runs-on: ubuntu-latest
