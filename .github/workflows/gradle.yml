@@ -62,8 +62,10 @@ jobs:
           umask 077
 
           # 비밀키 저장
-          printf '%s\n' "$BASTION_KEY" > ~/.ssh/wisoft-auth
-          sed -i 's/\r$//' ~/.ssh/wisoft-auth 
+          cat > ~/.ssh/wisoft-auth <<'EOF'
+          ${{ secrets.BASTION_KEY }}
+          EOF
+          sed -i 's/\r$//' ~/.ssh/wisoft-auth
           chmod 600 ~/.ssh/wisoft-auth
 
           # ssh config 작성
