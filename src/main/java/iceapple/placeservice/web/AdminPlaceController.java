@@ -15,12 +15,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/admin/places")
+@RequestMapping("/admin1/places")
 public class AdminPlaceController {
 
     private final PlaceService placeService;
 
-    // GET /admin/places
     @GetMapping
     public ResponseEntity<Map<String, List<AdminPlaceResponse>>> getAllPlaces() {
         try {
@@ -45,7 +44,6 @@ public class AdminPlaceController {
         }
     }
 
-    // POST /admin/places : 회의실 등록
     @PostMapping
     public ResponseEntity<Void> createPlace(@RequestBody final AdminPlaceRequest request) {
         try {
@@ -61,7 +59,6 @@ public class AdminPlaceController {
         }
     }
 
-    // DELETE /admin/places/{place_id} : 회의실 삭제
     @DeleteMapping("/{place_id}")
     public ResponseEntity<Void> deletePlace(@PathVariable("place_id") String placeId) {
         try {
