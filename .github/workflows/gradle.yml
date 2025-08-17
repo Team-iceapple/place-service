@@ -213,75 +213,95 @@ jobs:
           # 디렉토리 보장
           ssh iceapple "mkdir -p '$RELEASES' '$SHARED' '$LOGS' '$PIDS'"
       
-          # 원격에서 실행 (asdf 초기화 + set -x + trap)
-          ssh iceapple 'bash -lc "
+          # 원격에서 실행
+          ssh iceapple "bash -c '
             set -Eeuo pipefail
             set -x
-            trap '\''echo \"❌ line \$LINENO: \${BASH_COMMAND} (exit \$?)\"'\'' ERR
-      
-            # asdf 초기화 (비로그인 SSH 대비)
+            
+            # asdf 초기화
             if [ -f \"\$HOME/.asdf/asdf.sh\" ]; then
               . \"\$HOME/.asdf/asdf.sh\"
             fi
             export PATH=\$HOME/.asdf/shims:\$HOME/.asdf/bin:\$PATH
-      
-            echo PATH=\$PATH
+            
+            echo \"PATH=\$PATH\"
             command -v java || true
             java -version || true
-      
-            APP_DIR=\"'"$APP_DIR"'\"
-            RELEASES=\"'"$RELEASES"'\"
-            LOGS=\"'"$LOGS"'\"
-            PIDS=\"'"$PIDS"'\"
-            LOG_FILE=\"'"$LOG_FILE"'\"
-            PID_FILE=\"'"$PID_FILE"'\"
-      
-            # 최신 JAR
-            JAR_ON_SERVER=\$(ls -t \"\$RELEASES\"/*.jar | head -n 1)
-            [ -n \"\$JAR_ON_SERVER\" ] || { echo \"❌ no jar in \$RELEASES\"; exit 1; }
-            echo \"최신 JAR: \$JAR_ON_SERVER\"
-      
-             
-            # 실행 중 프로세스 종료 (없으면 무시)
-            if [ -f "$PID_FILE" ]; then
-              PID="$(tr -d '\r\n' < "$PID_FILE")"   # CR/LF 제거
-              if [ -n "$PID" ] && ps -p "$PID" >/dev/null 2>&1; then
-                kill "$PID" 2>/dev/null || true
-                sleep 3
-                ps -p "$PID" >/dev/null 2>&1 && kill -9 "$PID" 2>/dev/null || true
-              fi
-              rm -f "$PID_FILE"
-            else
-              APP_BASENAME="$(basename "$JAR_ON_SERVER")"
-              PIDS="$(pgrep -f "$APP_BASENAME" || true)"
-              if [ -n "$PIDS" ]; then
-                kill $PIDS 2>/dev/null || true
-                sleep 3
-                PIDS="$(pgrep -f "$APP_BASENAME" || true)"
-                [ -n "$PIDS" ] && kill -9 $PIDS 2>/dev/null || true
-              fi
-            fi
             
-            # 로그 파일 경로 쓰기 가능 확인
-            touch \"\$LOG_FILE\" && chmod 664 \"\$LOG_FILE\"
-      
-            echo \"새 프로세스 시작...\"
-            # ⛔ 외부 설정 경로 옵션 빼고 내부 application.properties만 사용해 먼저 띄움
-            nohup java -jar \"\$JAR_ON_SERVER\" >> \"\$LOG_FILE\" 2>&1 &
-      
-            pid=\$!
-            sleep 1
-            if [ -n \"\$pid\" ] && ps -p \"\$pid\" >/dev/null 2>&1; then
-              echo \"\$pid\" > \"\$PID_FILE\"
-              echo \"✅ PID: \$(cat \"\$PID_FILE\")\"
-              echo \"📜 최근 로그:\"
-              tail -n 50 \"\$LOG_FILE\" || true
-            else
-              echo \"❌ 프로세스가 즉시 종료됨. 로그 하단:\"
-              tail -n 100 \"\$LOG_FILE\" || true
+            APP_DIR=\"$APP_DIR\"
+            RELEASES=\"$RELEASES\"
+            LOGS=\"$LOGS\"
+            PIDS=\"$PIDS\"
+            LOG_FILE=\"$LOG_FILE\"
+            PID_FILE=\"$PID_FILE\"
+            
+            # 최신 JAR 확인
+            JAR_ON_SERVER=\$(ls -t \"\$RELEASES\"/*.jar | head -n 1)
+            if [ -z \"\$JAR_ON_SERVER\" ]; then
+              echo \"❌ releases 디렉토리에 JAR가 없습니다\"
               exit 1
             fi
-          "'
+            echo \"최신 JAR: \$JAR_ON_SERVER\"
+            
+            # PID 파일이 있으면 해당 프로세스만 종료 
+            if [ -f \"\$PID_FILE\" ]; then
+              OLD_PID=\$(cat \"\$PID_FILE\" | tr -d \"\\r\\n\")
+              if [ -n \"\$OLD_PID\" ] && ps -p \"\$OLD_PID\" >/dev/null 2>&1; then
+                echo \"기존 프로세스 종료 중... (PID: \$OLD_PID)\"
+                kill \"\$OLD_PID\" 2>/dev/null || true
+                sleep 5
+                if ps -p \"\$OLD_PID\" >/dev/null 2>&1; then
+                  echo \"강제 종료 중...\"
+                  kill -9 \"\$OLD_PID\" 2>/dev/null || true
+                fi
+              fi
+              rm -f \"\$PID_FILE\"
+            fi
+            
+            # place-service JAR과 정확히 일치하는 프로세스만 종료
+            JAR_BASENAME=\$(basename \"\$JAR_ON_SERVER\")
+            echo \"검색할 프로세스 패턴: \$JAR_BASENAME\"
+            
+            # 현재 실행 중인 같은 JAR 프로세스 확인
+            RUNNING_PIDS=\$(pgrep -f \"java.*\$JAR_BASENAME\" || true)
+            if [ -n \"\$RUNNING_PIDS\" ]; then
+              echo \"발견된 기존 프로세스들: \$RUNNING_PIDS\"
+              for pid in \$RUNNING_PIDS; do
+                echo \"프로세스 \$pid 종료 중...\"
+                kill \"\$pid\" 2>/dev/null || true
+              done
+              sleep 3
+              # 아직 살아있는 프로세스 강제 종료
+              REMAINING_PIDS=\$(pgrep -f \"java.*\$JAR_BASENAME\" || true)
+              if [ -n \"\$REMAINING_PIDS\" ]; then
+                echo \"강제 종료: \$REMAINING_PIDS\"
+                kill -9 \$REMAINING_PIDS 2>/dev/null || true
+              fi
+            else
+              echo \"실행 중인 기존 프로세스 없음\"
+            fi
+            
+            # 로그 파일 준비
+            touch \"\$LOG_FILE\" && chmod 664 \"\$LOG_FILE\"
+            
+            echo \"새 프로세스 시작...\"
+            nohup java -jar \"\$JAR_ON_SERVER\" >> \"\$LOG_FILE\" 2>&1 &
+            
+            NEW_PID=\$!
+            sleep 3
+            
+            if [ -n \"\$NEW_PID\" ] && ps -p \"\$NEW_PID\" >/dev/null 2>&1; then
+              echo \"\$NEW_PID\" > \"\$PID_FILE\"
+              echo \"✅ 애플리케이션 시작 성공 (PID: \$NEW_PID)\"
+              echo \"📋 최근 로그:\"
+              tail -n 20 \"\$LOG_FILE\" || true
+            else
+              echo \"❌ 애플리케이션 시작 실패\"
+              echo \"📋 에러 로그:\"
+              tail -n 50 \"\$LOG_FILE\" || true
+              exit 1
+            fi
+          '"
           
   dependency-submission:
     runs-on: ubuntu-latest
