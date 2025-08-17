@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/admin1/places")
+@RequestMapping("/admin/places")
 public class AdminPlaceController {
 
     private final PlaceService placeService;
