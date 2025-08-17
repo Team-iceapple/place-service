@@ -63,16 +63,16 @@ jobs:
 
           # 비밀키 저장
           cat > ~/.ssh/wisoft-auth <<'EOF'
-          ${{ secrets.SSH_PRIVATE_KEY }}
+          ${{ secrets.BASTION_KEY }}
           EOF
           chmod 600 ~/.ssh/wisoft-auth
 
           # ssh config 작성
           cat > ~/.ssh/config <<'EOF'
           Host bastion
-            HostName ${{ secrets.SSH_BASTION_HOST }}
-            Port ${{ secrets.SSH_BASTION_PORT }}
-            User ${{ secrets.SSH_BASTION_USER }}
+            HostName ${{ secrets.BASTION_HOST }}
+            Port ${{ secrets.BASTION_PORT }}
+            User ${{ secrets.BASTION_USER }}
             IdentityFile ~/.ssh/wisoft-auth
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null
