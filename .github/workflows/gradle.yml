@@ -100,7 +100,13 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-      
+
+          # asdf 초기화
+          if [ -f \"\$HOME/.asdf/asdf.sh\" ]; then
+            . \"\$HOME/.asdf/asdf.sh\"
+          fi
+          export PATH=\$HOME/.asdf/shims:\$HOME/.asdf/bin:\$PATH
+
           APP_DIR="/home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service"
           RELEASES="$APP_DIR/releases"
           SHARED="$APP_DIR/shared"
