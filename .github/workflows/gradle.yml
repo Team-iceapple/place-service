@@ -53,6 +53,20 @@ jobs:
           FILE=$(ls -t dist/*.jar | head -n 1)
           echo "jar_file=$FILE" >> "$GITHUB_OUTPUT"
           echo "Picked: $FILE"
+          
+      - name: SSH 클라이언트 설치 및 점검
+        shell: bash
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y openssh-client
+          which ssh || true
+          ssh -V || true
+
+      - name: SSH 디렉터리 권한 정리
+        shell: bash
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
 
       - name: SSH 구성 준비 (ProxyJump)
         shell: bash
@@ -101,12 +115,6 @@ jobs:
         run: |
           set -Eeuo pipefail
 
-          # asdf 초기화
-          if [ -f \"\$HOME/.asdf/asdf.sh\" ]; then
-            . \"\$HOME/.asdf/asdf.sh\"
-          fi
-          export PATH=\$HOME/.asdf/shims:\$HOME/.asdf/bin:\$PATH
-
           APP_DIR="/home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service"
           RELEASES="$APP_DIR/releases"
           SHARED="$APP_DIR/shared"
@@ -140,6 +148,13 @@ jobs:
           # 3) (원격) 최신 JAR 확인, 재시작
           ssh iceapple 'bash -lc "
             set -Eeuo pipefail
+
+            # asdf 초기화
+            if [ -f \"\$HOME/.asdf/asdf.sh\" ]; then
+              . \"\$HOME/.asdf/asdf.sh\"
+            fi
+            export PATH=\$HOME/.asdf/shims:\$HOME/.asdf/bin:\$PATH
+            
             APP_DIR='"$APP_DIR"'
             RELEASES='"$RELEASES"'
             SHARED='"$SHARED"'
@@ -148,13 +163,6 @@ jobs:
             LOG_FILE='"$LOG_FILE"'
             PID_FILE='"$PID_FILE"'
 
-            command -v java >/dev/null || { echo \"❌ java not found in PATH: \$PATH\"; exit 127; }
-            java -version
-      
-            test -f \"\$SHARED/application.properties\" || { echo \"❌ missing \$SHARED/application.properties\"; exit 1; }
-            test -f \"\$SHARED/application-db.properties\" || { echo \"❌ missing \$SHARED/application-db.properties\"; exit 1; }
-
-      
             JAR_ON_SERVER=\$(ls -t \"\$RELEASES\"/*.jar | head -n 1)
             if [ -z \"\$JAR_ON_SERVER\" ]; then
               echo \"❌ releases 디렉토리에 JAR가 없습니다\"; exit 1
@@ -188,6 +196,7 @@ jobs:
               echo \"❌ PID 수집 실패\"; exit 1
             fi
           "'
+          
   dependency-submission:
     runs-on: ubuntu-latest
     permissions:
