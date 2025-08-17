@@ -119,7 +119,7 @@ jobs:
             ${{ secrets.APPLICATION_PROD_PROPERTIES }}
             EOF_APP
             chmod 600 \"\$SHARED/application.properties\"
-
+            
             cat > \"\$SHARED/application-db.properties\" <<'EOF_DB'
             ${{ secrets.APPLICATION_DB_PROD_PROPERTIES }}
             EOF_DB
