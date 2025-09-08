@@ -48,7 +48,7 @@ public class AdminReservationController {
         }
     }
 
-    @PatchMapping("{reservation_id}")
+    @PatchMapping("/{reservation_id}")
     public ResponseEntity<Void> updateReservation(@PathVariable("reservation_id") String reservationId,
                                                   @RequestBody final AdminReservationRequest request) {
         try {
