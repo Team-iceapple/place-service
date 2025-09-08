@@ -23,7 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/admin/places/reservations")
+@RequestMapping("/admin/admin/places/reservations")
 public class AdminReservationController {
 
     private final ReservationService reservationService;
