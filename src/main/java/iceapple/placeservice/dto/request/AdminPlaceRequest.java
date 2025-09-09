@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 public class AdminPlaceRequest {
+
     private String name;
     private String description;
     private Integer placeCount;
