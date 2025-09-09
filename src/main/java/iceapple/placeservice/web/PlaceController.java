@@ -26,26 +26,11 @@ public class PlaceController {
 
     private final PlaceService placeService;
 
-//    @GetMapping
-//    public ResponseEntity<PlaceListResponse> getPlaces() {
-//        List<Place> places = placeService.findPlaces();
-//
-//        return ResponseEntity.ok(new PlaceListResponse(places));
-//    }
-
     @GetMapping
-    public ResponseEntity<PlaceListResponse> getPlaces() throws JsonProcessingException {
+    public ResponseEntity<PlaceListResponse> getPlaces() {
         List<Place> places = placeService.findPlaces();
-        PlaceListResponse body = new PlaceListResponse(places);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        byte[] bodyBytes = objectMapper.writeValueAsBytes(body); // 실제 JSON 직렬화
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentLength(bodyBytes.length); // Content-Length 명시
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        return new ResponseEntity<>(body, headers, HttpStatus.OK);
+        return ResponseEntity.ok(new PlaceListResponse(places));
     }
 
     @GetMapping("/{place_id}")
