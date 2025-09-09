@@ -25,6 +25,8 @@ public class PlaceController {
     public ResponseEntity<PlaceListResponse> getPlaces() {
         List<Place> places = placeService.findPlaces();
 
+        System.out.println("request");
+        System.out.println(new PlaceListResponse(places));
         return ResponseEntity.ok(new PlaceListResponse(places));
     }
 
@@ -34,6 +36,4 @@ public class PlaceController {
 
         return ResponseEntity.ok(placeService.findByPlaceId(placeId, date));
     }
-
-
 }
