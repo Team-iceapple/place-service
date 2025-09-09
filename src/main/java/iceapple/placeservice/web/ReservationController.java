@@ -35,11 +35,13 @@ public class ReservationController {
         if (request.getPassword() == null || request.getPassword().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호는 필수입니다.");
         }
-        List<ReservationPlaceResponse> response = reservationService.searchReservationInfo(request.getStudentNumber(),
+
+        List<ReservationPlaceResponse> response = reservationService.searchReservationInfo(
+                request.getStudentNumber(),
                 request.getPassword());
+
         return ResponseEntity.ok(response);
     }
-
 
     @PostMapping()
     public ResponseEntity<Void> createReservation(@RequestBody final ReservationRequest request) {

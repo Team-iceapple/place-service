@@ -12,9 +12,12 @@ import iceapple.placeservice.repository.ReservationRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 
 public class ReservationService {
@@ -33,26 +36,34 @@ public class ReservationService {
                                                                 final String inputPassword) {
         // 1. 비밀번호 없이 전체 예약 가져오기
         List<Reservation> reservations = reservationRepository.findByStudentNumber(studentNumber);
-        List<ReservationPlaceResponse> result = new ArrayList<>();
 
-        for (Reservation res : reservations) {
-            // 2. 암호화된 비밀번호와 평문 비교
-            if (!passwordEncoder.matches(inputPassword, res.getPassword())) {
-                continue; // 비밀번호 불일치 → 스킵
-            }
-
-            // 3. 비밀번호 일치 → 응답 조립
-            String placeId = res.getPlaceId();
-            String placeName = reservationRepository.findNamePlace(placeId);
-            Place place = new Place(placeId, placeName);
-
-            ReservationPlaceResponse response = new ReservationPlaceResponse(
-                    res.getId(), res.getTimes(), res.getDate(), place
-            );
-            result.add(response);
+        if (reservations.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 학번으로 등록된 예약이 없습니다.");
         }
 
-        return result;
+        List<ReservationPlaceResponse> result = new ArrayList<>();
+
+        boolean hasAnyMatch = reservations.stream()
+                .anyMatch(res -> passwordEncoder.matches(inputPassword, res.getPassword()));
+
+        if (!hasAnyMatch) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "비밀번호가 일치하지 않습니다."
+            );
+        }
+
+        return reservations.stream()
+                .filter(res -> passwordEncoder.matches(inputPassword, res.getPassword()))
+                .map(res -> {
+                    String placeId = res.getPlaceId();
+                    String placeName = reservationRepository.findNamePlace(placeId);
+                    Place place = new Place(placeId, placeName);
+                    return new ReservationPlaceResponse(
+                            res.getId(), res.getTimes(), res.getDate(), place
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -166,7 +177,6 @@ public class ReservationService {
                 request.getTimes(),
                 request.getUserName()
         );
-
 
         reservationRepository.updateReservationInfo(reservationId, updateReservation);
     }
