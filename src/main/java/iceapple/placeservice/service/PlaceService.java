@@ -3,6 +3,7 @@ package iceapple.placeservice.service;
 import iceapple.placeservice.dto.response.PlaceTimeCountResponse;
 import iceapple.placeservice.entity.Place;
 import iceapple.placeservice.repository.PlaceRepository;
+import iceapple.placeservice.repository.ReservationRepository;
 import iceapple.placeservice.util.TimeCount;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,6 +25,8 @@ public class PlaceService {
     public PlaceTimeCountResponse findByPlaceId(String id, LocalDate date) {
         String name = placeRepository.findPlaceNameById(id);
         List<TimeCount> counts = placeRepository.findTimeCount(id, date);
+        int maxCount = placeRepository.findPlaceCountById(id);
+
         int[] countArray = new int[10];
 
         for (TimeCount count : counts) {
@@ -37,6 +40,7 @@ public class PlaceService {
         PlaceTimeCountResponse response = PlaceTimeCountResponse.builder()
                 .name(name)
                 .count(countArray)
+                .maxCount(maxCount)
                 .build();
 
         return response;
