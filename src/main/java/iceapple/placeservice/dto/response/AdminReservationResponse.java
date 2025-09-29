@@ -19,14 +19,18 @@ public class AdminReservationResponse {
 
     private PlaceInfo place;
 
+    @JsonProperty("res_count")
+    private final int resCount;
+
     public AdminReservationResponse(final String id, final List<Integer> times, final String studentNumber,
                                     final String phoneNumber,
-                                    final PlaceInfo place) {
+                                    final PlaceInfo place, final int resCount) {
         this.id = id;
         this.times = times;
         this.studentNumber = studentNumber;
         this.phoneNumber = phoneNumber;
         this.place = place;
+        this.resCount = resCount;
     }
 
     @Getter

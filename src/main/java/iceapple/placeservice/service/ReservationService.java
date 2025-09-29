@@ -145,7 +145,8 @@ public class ReservationService {
             );
 
             AdminReservationResponse response = new AdminReservationResponse(
-                    res.getId(), res.getTimes(), res.getStudentNumber(), res.getPhoneNumber(), placeInfo
+                    res.getId(), res.getTimes(), res.getStudentNumber(), res.getPhoneNumber(), placeInfo,
+                    res.getResCount()
             );
 
             result.add(response);
