@@ -76,15 +76,16 @@ public class JdbcPlaceRepository implements PlaceRepository {
     }
 
     @Override
-    public void decreaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times) {
+    public void decreaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times, Integer resCount) {
         final String sql =
-                "UPDATE time_count SET count = GREATEST(count - 1, 0) " +
+                "UPDATE time_count SET count = GREATEST(count - ?, 0) " +
                         "WHERE place_id = ? AND date = ? AND time = ?";
 
         jdbcTemplate.batchUpdate(sql, times, times.size(), (ps, t) -> {
-            ps.setString(1, placeId);
-            ps.setDate(2, java.sql.Date.valueOf(date));
-            ps.setInt(3, t);
+            ps.setInt(1, resCount);
+            ps.setString(2, placeId);
+            ps.setDate(3, java.sql.Date.valueOf(date));
+            ps.setInt(4, t);
         });
     }
 

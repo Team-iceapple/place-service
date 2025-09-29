@@ -12,7 +12,7 @@ public interface PlaceRepository {
     String findPlaceNameById(String id);
     Integer findPlaceCountById(String id);
     void increaseTimeCount(String placeId, LocalDate date, List<Integer> times, Integer resCount);
-    void decreaseTimeCount(String placeId, LocalDate date, List<Integer> times); // (취소 시)
+    void decreaseTimeCount(String placeId, LocalDate date, List<Integer> times, Integer resCount); // (취소 시)
 
     // 관리자용 쓰기/조회 보조
     void insert(Place place, Integer placeCount);

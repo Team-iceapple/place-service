@@ -4,29 +4,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class AdminReservationRequest {
-    private LocalDate date;
+    private final LocalDate date;
 
     @JsonProperty("place_id")
-    private String placeId;
+    private final String placeId;
 
-    private List<Integer> times;
+    private final List<Integer> times;
 
     @JsonProperty("user_name")
-    private String userName;
+    private final String userName;
 
-    public AdminReservationRequest() {
-    }
-
-    public AdminReservationRequest(LocalDate date, String placeId, List<Integer> times,
-                                   String userName) {
-        this.date = date;
-        this.placeId = placeId;
-        this.times = times;
-        this.userName = userName;
-    }
+    @JsonProperty("res_count")
+    private final int resCount;
 }

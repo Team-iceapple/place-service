@@ -100,7 +100,7 @@ public class ReservationService {
         }
 
         for (ReservationSlot s : slots) {
-            placeRepository.decreaseTimeCount(s.placeId(), s.date(), s.times());
+            placeRepository.decreaseTimeCount(s.placeId(), s.date(), s.times(), s.resCount());
         }
         return ResponseEntity.noContent().build();
     }
@@ -117,14 +117,14 @@ public class ReservationService {
                 request.getPlaceId(),
                 request.getDate().atStartOfDay(),
                 request.getTimes(),
-                1
+                request.getResCount()
         );
 
         placeRepository.increaseTimeCount(
                 request.getPlaceId(),
                 request.getDate(),
                 request.getTimes(),
-                1
+                request.getResCount()
         );
 
         return reservationRepository.createReservation(toSave);
@@ -166,21 +166,24 @@ public class ReservationService {
         placeRepository.decreaseTimeCount(
                 reservation.getPlaceId(),
                 reservation.getDate().toLocalDate(),
-                reservation.getTimes()
+                reservation.getTimes(),
+                reservation.getResCount()
         );
 
         placeRepository.increaseTimeCount(
                 request.getPlaceId(),
                 request.getDate(),
                 request.getTimes(),
-                1
+                request.getResCount()
         );
 
         AdminReservationRequest updateReservation = new AdminReservationRequest(
                 request.getDate(),
                 request.getPlaceId(),
                 request.getTimes(),
-                request.getUserName()
+                request.getUserName(),
+                request.getResCount()
+
         );
 
         reservationRepository.updateReservationInfo(reservationId, updateReservation);

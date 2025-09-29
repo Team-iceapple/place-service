@@ -13,5 +13,6 @@ import java.util.List;
 public record ReservationSlot(
     String placeId,
     LocalDate date,
-    List<Integer> times
+    List<Integer> times,
+    Integer resCount
 ) {}

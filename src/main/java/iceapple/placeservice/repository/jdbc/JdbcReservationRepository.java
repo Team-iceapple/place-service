@@ -145,7 +145,7 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public List<ReservationSlot> deleteAndReturnSlots(final List<String> ids) {
-        String sql = "DELETE FROM reservation WHERE id = ANY (?) RETURNING place_id, date, times";
+        String sql = "DELETE FROM reservation WHERE id = ANY (?) RETURNING place_id, date, times, res_count";
 
         return jdbcTemplate.query(
                 con -> {
@@ -159,8 +159,9 @@ public class JdbcReservationRepository implements ReservationRepository {
                         String placeId = rs.getString("place_id");
                         LocalDate date = rs.getTimestamp("date").toLocalDateTime().toLocalDate();
                         Integer[] timesArr = (Integer[]) rs.getArray("times").getArray();
+                        Integer resCount = rs.getInt("res_count");
 
-                        result.add(new ReservationSlot(placeId, date, Arrays.asList(timesArr)));
+                        result.add(new ReservationSlot(placeId, date, Arrays.asList(timesArr), resCount));
                     }
                     return result;
                 }
