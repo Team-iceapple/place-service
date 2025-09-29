@@ -24,22 +24,13 @@ public class AdminPlaceController {
     public ResponseEntity<Map<String, List<AdminPlaceResponse>>> getAllPlaces() {
         try {
             List<AdminPlaceResponse> places = placeService.findPlaces().stream()
-                    .map(p -> new AdminPlaceResponse(p.getId(), p.getName(), p.getDescription()))
-                    .collect(Collectors.toList());
+                    .map(p -> {
+                        int count = placeService.findPlaceCountById(p.getId());
+                        return new AdminPlaceResponse(p.getId(), p.getName(), p.getDescription(), count);
+                    })
+                    .toList();
             return ResponseEntity.ok(Map.of("places", places));
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
-
-    @GetMapping("/{place_id}")
-    public ResponseEntity<Map<String, AdminPlaceResponse>> getPlace(@PathVariable("place_id") String placeId) {
-        try {
-            Place p = placeService.adminGetPlace(placeId);
-            AdminPlaceResponse body = new AdminPlaceResponse(p.getId(), p.getName(), p.getDescription());
-            return ResponseEntity.ok(Map.of("place", body));
-        } catch (Exception e) {
-            e.printStackTrace(); // 원인 확인용 (원하면 제거)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }

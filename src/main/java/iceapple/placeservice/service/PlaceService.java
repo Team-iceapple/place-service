@@ -21,6 +21,10 @@ public class PlaceService {
     public List<Place> findPlaces() {
         return placeRepository.findAll();
     }
+    
+    public Integer findPlaceCountById(String id) {
+        return placeRepository.findPlaceCountById(id);
+    };
 
     public PlaceTimeCountResponse findByPlaceId(String id, LocalDate date) {
         String name = placeRepository.findPlaceNameById(id);
