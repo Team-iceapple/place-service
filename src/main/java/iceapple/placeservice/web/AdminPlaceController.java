@@ -35,20 +35,37 @@ public class AdminPlaceController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<Void> createPlace(@RequestBody final AdminPlaceRequest request) {
-        try {
-            Place saved = placeService.createPlace(
-                    request.getName(),
-                    request.getDescription(),
-                    request.getPlaceCount()
-            );
-            // 예약 컨트롤러와 동일하게 바디 없이 201만 돌려도 되고, 필요하면 Location 헤더 추가
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+//    @PostMapping
+//    public ResponseEntity<Void> createPlace(@RequestBody final AdminPlaceRequest request) {
+//        try {
+//            Place saved = placeService.createPlace(
+//                    request.getName(),
+//                    request.getDescription(),
+//                    request.getPlaceCount()
+//            );
+//            // 예약 컨트롤러와 동일하게 바디 없이 201만 돌려도 되고, 필요하면 Location 헤더 추가
+//            return ResponseEntity.status(HttpStatus.CREATED).build();
+//        } catch (RuntimeException e) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+//        }
+//    }
+@PostMapping
+public ResponseEntity<Map<String, String>> createPlace(@RequestBody final AdminPlaceRequest request) {
+    try {
+        Place saved = placeService.createPlace(
+                request.getName(),
+                request.getDescription(),
+                request.getPlaceCount()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(Map.of("place_id", saved.getId())); // place_id 반환
+
+    } catch (RuntimeException e) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
+}
 
     @DeleteMapping("/{place_id}")
     public ResponseEntity<Void> deletePlace(@PathVariable("place_id") String placeId) {
