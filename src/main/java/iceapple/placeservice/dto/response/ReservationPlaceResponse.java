@@ -1,23 +1,22 @@
 package iceapple.placeservice.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import iceapple.placeservice.entity.Place;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class ReservationPlaceResponse {
-    private String id;
-    private List<Integer> times;
-    private LocalDateTime date;
-    private Place place;
+    private final String id;
+    private final List<Integer> times;
+    private final LocalDateTime date;
+    private final Place place;
 
-    public ReservationPlaceResponse(final String id, final List<Integer> times, final LocalDateTime date, final Place place) {
-        this.id = id;
-        this.times = times;
-        this.date = date;
-        this.place = place;
-    }
+    @JsonProperty("res_count")
+    private final int resCount;
 }

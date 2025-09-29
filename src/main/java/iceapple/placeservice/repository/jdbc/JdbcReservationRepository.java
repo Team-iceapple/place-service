@@ -32,9 +32,9 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public ResponseEntity<Void> createReservation(final ReservationRequest request) {
-        String sql = "INSERT INTO reservation (id, student_number, phone_number, password, place_id, date, times) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reservation (id, student_number, phone_number, password, place_id, date, times, res_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        String id = String.format("r_%s", UUID.randomUUID().toString());
+        String id = String.format("r_%s", UUID.randomUUID());
 
         jdbcTemplate.update(connection -> {
             PreparedStatement psmt = connection.prepareStatement(sql, new String[]{"id"});
@@ -45,6 +45,7 @@ public class JdbcReservationRepository implements ReservationRepository {
             psmt.setString(5, request.getPlaceId());
             psmt.setTimestamp(6, Timestamp.valueOf(request.getDate()));
             psmt.setObject(7, request.getTimes().toArray(new Integer[0]));
+            psmt.setInt(8, request.getResCount());
             return psmt;
         });
 
@@ -99,8 +100,9 @@ public class JdbcReservationRepository implements ReservationRepository {
 
             LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
             String placeId = rs.getString("place_id");
+            int resCount = rs.getInt("res_count");
 
-            return new Reservation(id, studentNumber, phoneNumber, password, placeId, date, times);
+            return new Reservation(id, studentNumber, phoneNumber, password, placeId, date, times, resCount);
         });
     }
 
@@ -181,7 +183,8 @@ public class JdbcReservationRepository implements ReservationRepository {
                     rs.getString("password"),
                     rs.getString("place_id"),
                     dateTime,
-                    times
+                    times,
+                    rs.getInt("res_count")
             );
         };
     }

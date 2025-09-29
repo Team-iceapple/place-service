@@ -65,7 +65,7 @@ public class MockPlaceRepository implements PlaceRepository {
     }
 
     @Override
-    public void increaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times) {
+    public void increaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times, Integer resCount) {
 
     }
 
