@@ -60,7 +60,7 @@ public class ReservationService {
                     String placeName = reservationRepository.findNamePlace(placeId);
                     Place place = new Place(placeId, placeName);
                     return new ReservationPlaceResponse(
-                            res.getId(), res.getTimes(), res.getDate(), place
+                            res.getId(), res.getTimes(), res.getDate(), place, res.getResCount()
                     );
                 })
                 .collect(Collectors.toList());
@@ -76,13 +76,15 @@ public class ReservationService {
                 encodedPassword,
                 request.getPlaceId(),
                 request.getDate(),
-                request.getTimes()
+                request.getTimes(),
+                request.getResCount()
         );
 
         placeRepository.increaseTimeCount(
                 request.getPlaceId(),
                 LocalDate.from(request.getDate()),
-                request.getTimes()
+                request.getTimes(),
+                request.getResCount()
         );
 
         return reservationRepository.createReservation(toSave);
@@ -114,13 +116,15 @@ public class ReservationService {
                 encodedPassword,
                 request.getPlaceId(),
                 request.getDate().atStartOfDay(),
-                request.getTimes()
+                request.getTimes(),
+                1
         );
 
         placeRepository.increaseTimeCount(
                 request.getPlaceId(),
                 request.getDate(),
-                request.getTimes()
+                request.getTimes(),
+                1
         );
 
         return reservationRepository.createReservation(toSave);
@@ -168,7 +172,8 @@ public class ReservationService {
         placeRepository.increaseTimeCount(
                 request.getPlaceId(),
                 request.getDate(),
-                request.getTimes()
+                request.getTimes(),
+                1
         );
 
         AdminReservationRequest updateReservation = new AdminReservationRequest(
