@@ -104,23 +104,32 @@ jobs:
       - name: JAR 파일 복사
         run: scp "${{ steps.pick.outputs.jar_file }}" iceapple:/home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service/releases/
 
-      - name: 설정 파일 덮어쓰기 (application.properties, application-db.properties)
+      - name: 설정 파일 안전 생성 및 전송 (application.properties, application-db.properties)
+        shell: bash
         run: |
-          ssh iceapple 'bash -lc "
-            SHARED=\"/home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service/shared\"
-            mkdir -p \"\$SHARED\"
+          set -euo pipefail
 
-            # 덮어쓰기
-            cat > \"\$SHARED/application.properties\" <<EOF_APP
-            ${{ secrets.APPLICATION_PROD_PROPERTIES }}
-            EOF_APP
+          # 1) 런너 임시 디렉토리 생성
+          TMPDIR="$(mktemp -d)"
+          trap 'rm -rf "$TMPDIR"' EXIT
 
-            cat > \"\$SHARED/application-db.properties\" <<EOF_DB
-            ${{ secrets.APPLICATION_DB_PROD_PROPERTIES }}
-            EOF_DB
+          # 2) secrets 내용을 로컬 파일로 생성 (줄바꿈 포함)
+          printf '%s\n' "${{ secrets.APPLICATION_PROD_PROPERTIES }}" > "$TMPDIR/application.properties"
+          printf '%s\n' "${{ secrets.APPLICATION_DB_PROD_PROPERTIES }}" > "$TMPDIR/application-db.properties"
 
-            echo '[INFO] 설정 파일 덮어쓰기 완료'
-          "'
+          # 3) 서버의 shared 디렉토리 보장
+          ssh iceapple "mkdir -p /home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service/shared"
+
+          # 4) 파일 전송 (덮어쓰기)
+          scp -q "$TMPDIR/application.properties"     iceapple:/home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service/shared/application.properties
+          scp -q "$TMPDIR/application-db.properties"  iceapple:/home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service/shared/application-db.properties
+
+          # 5) 서버에서 권한 보정
+          ssh iceapple "chmod 644 /home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service/shared/application.properties \
+                         /home/${{ secrets.SSH_TARGET_USER }}/iceapple/apps/place-service/shared/application-db.properties || true"
+
+          echo '[INFO] 설정 파일 안전 전송 완료'
+          
 
       - name: 원격 배포(프로세스 종료 → nohup 실행 → 로그)
         run: |
