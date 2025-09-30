@@ -1,17 +1,14 @@
 package iceapple.placeservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Getter;
 
-@Builder
-@Getter
-public class PlaceTimeCountResponse {
-    private String name;
-    private int[] count;
+public record PlaceTimeCountResponse(
+        String name,
+        int[] count,
 
-    @JsonProperty("max_count")
-    private int maxCount;
+        @JsonProperty("max_count")
+        int maxCount
+) {
 }
 
 

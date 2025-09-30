@@ -2,47 +2,27 @@ package iceapple.placeservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-public class AdminReservationResponse {
-    private String id;
-    private List<Integer> times;
+public record AdminReservationResponse(
+        String id,
+        List<Integer> times,
 
-    @JsonProperty("student_number")
-    private String studentNumber;
+        @JsonProperty("student_number")
+        String studentNumber,
 
-    @JsonProperty("phone_number")
-    private String phoneNumber;
+        @JsonProperty("phone_number")
+        String phoneNumber,
 
-    private PlaceInfo place;
+        PlaceInfo place,
 
-    public AdminReservationResponse(final String id, final List<Integer> times, final String studentNumber,
-                                    final String phoneNumber,
-                                    final PlaceInfo place) {
-        this.id = id;
-        this.times = times;
-        this.studentNumber = studentNumber;
-        this.phoneNumber = phoneNumber;
-        this.place = place;
-    }
+        @JsonProperty("res_count")
+        int resCount
+) {
+    public record PlaceInfo(
+            String id,
 
-    @Getter
-    @Setter
-    public static class PlaceInfo {
-        private String id;
-        private String name;
-        private int count;
+            String name,
 
-        public PlaceInfo() {
-        }
-
-        public PlaceInfo(final String id, final String name, final int count) {
-            this.id = id;
-            this.name = name;
-            this.count = count;
-        }
-    }
+            int count
+    ) {}
 }

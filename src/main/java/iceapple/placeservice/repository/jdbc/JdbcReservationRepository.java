@@ -32,19 +32,20 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public ResponseEntity<Void> createReservation(final ReservationRequest request) {
-        String sql = "INSERT INTO reservation (id, student_number, phone_number, password, place_id, date, times) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reservation (id, student_number, phone_number, password, place_id, date, times, res_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        String id = String.format("r_%s", UUID.randomUUID().toString());
+        String id = String.format("r_%s", UUID.randomUUID());
 
         jdbcTemplate.update(connection -> {
             PreparedStatement psmt = connection.prepareStatement(sql, new String[]{"id"});
             psmt.setString(1, id.toString());
-            psmt.setString(2, request.getStudentNumber());
-            psmt.setString(3, request.getPhoneNumber());
-            psmt.setString(4, request.getPassword());
-            psmt.setString(5, request.getPlaceId());
-            psmt.setTimestamp(6, Timestamp.valueOf(request.getDate()));
-            psmt.setObject(7, request.getTimes().toArray(new Integer[0]));
+            psmt.setString(2, request.studentNumber());
+            psmt.setString(3, request.phoneNumber());
+            psmt.setString(4, request.password());
+            psmt.setString(5, request.placeId());
+            psmt.setTimestamp(6, Timestamp.valueOf(request.date()));
+            psmt.setObject(7, request.times().toArray(new Integer[0]));
+            psmt.setInt(8, request.resCount());
             return psmt;
         });
 
@@ -60,10 +61,10 @@ public class JdbcReservationRepository implements ReservationRepository {
         int updated = jdbcTemplate.update(connection -> {
             var ps = connection.prepareStatement(sql);
 
-            Integer[] times = request.getTimes().toArray(new Integer[0]);
+            Integer[] times = request.times().toArray(new Integer[0]);
             Array sqlArray = connection.createArrayOf("integer", times);
 
-            ps.setDate(1, Date.valueOf(request.getDate()));
+            ps.setDate(1, Date.valueOf(request.date()));
             ps.setArray(2, sqlArray);
             ps.setString(3, reservationId);
             return ps;
@@ -99,8 +100,9 @@ public class JdbcReservationRepository implements ReservationRepository {
 
             LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
             String placeId = rs.getString("place_id");
+            int resCount = rs.getInt("res_count");
 
-            return new Reservation(id, studentNumber, phoneNumber, password, placeId, date, times);
+            return new Reservation(id, studentNumber, phoneNumber, password, placeId, date, times, resCount);
         });
     }
 
@@ -143,7 +145,7 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public List<ReservationSlot> deleteAndReturnSlots(final List<String> ids) {
-        String sql = "DELETE FROM reservation WHERE id = ANY (?) RETURNING place_id, date, times";
+        String sql = "DELETE FROM reservation WHERE id = ANY (?) RETURNING place_id, date, times, res_count";
 
         return jdbcTemplate.query(
                 con -> {
@@ -157,8 +159,9 @@ public class JdbcReservationRepository implements ReservationRepository {
                         String placeId = rs.getString("place_id");
                         LocalDate date = rs.getTimestamp("date").toLocalDateTime().toLocalDate();
                         Integer[] timesArr = (Integer[]) rs.getArray("times").getArray();
+                        Integer resCount = rs.getInt("res_count");
 
-                        result.add(new ReservationSlot(placeId, date, Arrays.asList(timesArr)));
+                        result.add(new ReservationSlot(placeId, date, Arrays.asList(timesArr), resCount));
                     }
                     return result;
                 }
@@ -181,7 +184,8 @@ public class JdbcReservationRepository implements ReservationRepository {
                     rs.getString("password"),
                     rs.getString("place_id"),
                     dateTime,
-                    times
+                    times,
+                    rs.getInt("res_count")
             );
         };
     }

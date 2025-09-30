@@ -10,6 +10,7 @@ import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.annotation.Transactional;
 
 public class JdbcPlaceRepository implements PlaceRepository {
 
@@ -44,8 +45,9 @@ public class JdbcPlaceRepository implements PlaceRepository {
         return jdbcTemplate.queryForObject(sql, Integer.class, placeId);
     }
 
+    @Transactional
     @Override
-    public void increaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times) {
+    public void increaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times, Integer resCount) {
 
         jdbcTemplate.queryForObject("SELECT place_count FROM place WHERE id = ? FOR UPDATE",
                 Integer.class, placeId);
@@ -58,15 +60,15 @@ public class JdbcPlaceRepository implements PlaceRepository {
         // 정원 미만일 때만 +1
         final String incSql =
                 "UPDATE time_count " +
-                        "SET count = count + 1 " +
+                        "SET count = count + ? " +
                         "WHERE place_id = ? AND date = ? AND time = ? " +
-                        "  AND count < (SELECT place_count FROM place WHERE id = ?)";
+                        "  AND count + ?  <= (SELECT place_count FROM place WHERE id = ?)";
 
         Date d = Date.valueOf(date);
 
         for (Integer t : times) {
             jdbcTemplate.update(ensureSql, placeId, d, t);
-            int affected = jdbcTemplate.update(incSql, placeId, d, t, placeId);
+            int affected = jdbcTemplate.update(incSql, resCount, placeId, d, t, resCount, placeId);
             if (affected == 0) {
                 throw new IllegalStateException("정원 초과");
             }
@@ -74,15 +76,16 @@ public class JdbcPlaceRepository implements PlaceRepository {
     }
 
     @Override
-    public void decreaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times) {
+    public void decreaseTimeCount(final String placeId, final LocalDate date, final List<Integer> times, Integer resCount) {
         final String sql =
-                "UPDATE time_count SET count = GREATEST(count - 1, 0) " +
+                "UPDATE time_count SET count = GREATEST(count - ?, 0) " +
                         "WHERE place_id = ? AND date = ? AND time = ?";
 
         jdbcTemplate.batchUpdate(sql, times, times.size(), (ps, t) -> {
-            ps.setString(1, placeId);
-            ps.setDate(2, java.sql.Date.valueOf(date));
-            ps.setInt(3, t);
+            ps.setInt(1, resCount);
+            ps.setString(2, placeId);
+            ps.setDate(3, java.sql.Date.valueOf(date));
+            ps.setInt(4, t);
         });
     }
 

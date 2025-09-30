@@ -6,11 +6,16 @@ import iceapple.placeservice.entity.Place;
 import iceapple.placeservice.service.PlaceService;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 @RequiredArgsConstructor
@@ -35,20 +40,24 @@ public class AdminPlaceController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<Void> createPlace(@RequestBody final AdminPlaceRequest request) {
-        try {
-            Place saved = placeService.createPlace(
-                    request.getName(),
-                    request.getDescription(),
-                    request.getPlaceCount()
-            );
-            // 예약 컨트롤러와 동일하게 바디 없이 201만 돌려도 되고, 필요하면 Location 헤더 추가
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+
+@PostMapping
+public ResponseEntity<Map<String, String>> createPlace(@RequestBody final AdminPlaceRequest request) {
+    try {
+        Place saved = placeService.createPlace(
+                request.name(),
+                request.description(),
+                request.placeCount()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(Map.of("place_id", saved.getId())); // place_id 반환
+
+    } catch (RuntimeException e) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
+}
 
     @DeleteMapping("/{place_id}")
     public ResponseEntity<Void> deletePlace(@PathVariable("place_id") String placeId) {

@@ -1,23 +1,12 @@
 package iceapple.placeservice.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-public class ReservationInfoRequest {
+public record ReservationInfoRequest(
+        @JsonProperty("student_number")
+        String studentNumber,
 
-    @JsonProperty("student_number")
-    private String studentNumber;
-    private String password;
-
-    public ReservationInfoRequest() {
-    }
-
-    public ReservationInfoRequest(String studentNumber, String password) {
-        this.studentNumber = studentNumber;
-        this.password = password;
-    }
+        String password
+) {
 }
 
