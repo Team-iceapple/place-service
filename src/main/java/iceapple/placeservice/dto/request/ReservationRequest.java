@@ -3,26 +3,24 @@ package iceapple.placeservice.dto.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@RequiredArgsConstructor
-public class ReservationRequest {
-    @JsonProperty("student_number")
-    private final String studentNumber;
+public record ReservationRequest(
+        @JsonProperty("student_number")
+        String studentNumber,
 
-    @JsonProperty("phone_number")
-    private final String phoneNumber;
-    private final String password;
+        @JsonProperty("phone_number")
+        String phoneNumber,
 
-    @JsonProperty("place_id")
-    private final String placeId;
-    private final LocalDateTime date;
-    private final List<Integer> times;
+        String password,
 
-    @JsonProperty("res_count")
-    private final int resCount;
+        @JsonProperty("place_id")
+        String placeId,
+
+        LocalDateTime date,
+
+        List<Integer> times,
+
+        @JsonProperty("res_count")
+        int resCount
+) {
 }

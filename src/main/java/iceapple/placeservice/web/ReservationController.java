@@ -28,16 +28,16 @@ public class ReservationController {
 
     @PostMapping("/reservation-info")
     public ResponseEntity<?> reservationInfo(@RequestBody final ReservationInfoRequest request) {
-        if (request.getStudentNumber() == null || request.getStudentNumber().isBlank()) {
+        if (request.studentNumber() == null || request.studentNumber().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("학번은 필수입니다.");
         }
-        if (request.getPassword() == null || request.getPassword().isBlank()) {
+        if (request.password() == null || request.password().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호는 필수입니다.");
         }
 
         List<ReservationPlaceResponse> response = reservationService.searchReservationInfo(
-                request.getStudentNumber(),
-                request.getPassword());
+                request.studentNumber(),
+                request.password());
 
         return ResponseEntity.ok(response);
     }
@@ -62,6 +62,4 @@ public class ReservationController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
-
-
 }

@@ -40,27 +40,14 @@ public class AdminPlaceController {
         }
     }
 
-//    @PostMapping
-//    public ResponseEntity<Void> createPlace(@RequestBody final AdminPlaceRequest request) {
-//        try {
-//            Place saved = placeService.createPlace(
-//                    request.getName(),
-//                    request.getDescription(),
-//                    request.getPlaceCount()
-//            );
-//            // 예약 컨트롤러와 동일하게 바디 없이 201만 돌려도 되고, 필요하면 Location 헤더 추가
-//            return ResponseEntity.status(HttpStatus.CREATED).build();
-//        } catch (RuntimeException e) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-//        }
-//    }
+
 @PostMapping
 public ResponseEntity<Map<String, String>> createPlace(@RequestBody final AdminPlaceRequest request) {
     try {
         Place saved = placeService.createPlace(
-                request.getName(),
-                request.getDescription(),
-                request.getPlaceCount()
+                request.name(),
+                request.description(),
+                request.placeCount()
         );
 
         return ResponseEntity

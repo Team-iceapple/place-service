@@ -1,14 +1,10 @@
 package iceapple.placeservice.dto.request;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+public record AdminPlaceRequest(
+        String name,
 
-@Setter
-@Getter
-@NoArgsConstructor
-public class AdminPlaceRequest {
-    private String name;
-    private String description;
-    private Integer placeCount;
+        String description,
+
+        Integer placeCount
+) {
 }

@@ -68,23 +68,23 @@ public class ReservationService {
 
     @Transactional
     public ResponseEntity<Void> createReservation(final ReservationRequest request) {
-        String encodedPassword = passwordEncoder.encode(request.getPassword());
-        System.out.println(request.getDate());
+        String encodedPassword = passwordEncoder.encode(request.password());
+        System.out.println(request.date());
         ReservationRequest toSave = new ReservationRequest(
-                request.getStudentNumber(),
-                request.getPhoneNumber(),
+                request.studentNumber(),
+                request.phoneNumber(),
                 encodedPassword,
-                request.getPlaceId(),
-                request.getDate(),
-                request.getTimes(),
-                request.getResCount()
+                request.placeId(),
+                request.date(),
+                request.times(),
+                request.resCount()
         );
 
         placeRepository.increaseTimeCount(
-                request.getPlaceId(),
-                LocalDate.from(request.getDate()),
-                request.getTimes(),
-                request.getResCount()
+                request.placeId(),
+                LocalDate.from(request.date()),
+                request.times(),
+                request.resCount()
         );
 
         return reservationRepository.createReservation(toSave);
@@ -114,17 +114,17 @@ public class ReservationService {
                 "0000000",
                 "admin",
                 encodedPassword,
-                request.getPlaceId(),
-                request.getDate().atStartOfDay(),
-                request.getTimes(),
-                request.getResCount()
+                request.placeId(),
+                request.date().atStartOfDay(),
+                request.times(),
+                request.resCount()
         );
 
         placeRepository.increaseTimeCount(
-                request.getPlaceId(),
-                request.getDate(),
-                request.getTimes(),
-                request.getResCount()
+                request.placeId(),
+                request.date(),
+                request.times(),
+                request.resCount()
         );
 
         return reservationRepository.createReservation(toSave);
@@ -172,18 +172,18 @@ public class ReservationService {
         );
 
         placeRepository.increaseTimeCount(
-                request.getPlaceId(),
-                request.getDate(),
-                request.getTimes(),
-                request.getResCount()
+                request.placeId(),
+                request.date(),
+                request.times(),
+                request.resCount()
         );
 
         AdminReservationRequest updateReservation = new AdminReservationRequest(
-                request.getDate(),
-                request.getPlaceId(),
-                request.getTimes(),
-                request.getUserName(),
-                request.getResCount()
+                request.date(),
+                request.placeId(),
+                request.times(),
+                request.userName(),
+                request.resCount()
 
         );
 

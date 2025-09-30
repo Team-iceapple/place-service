@@ -21,7 +21,7 @@ public class PlaceService {
     public List<Place> findPlaces() {
         return placeRepository.findAll();
     }
-    
+
     public Integer findPlaceCountById(String id) {
         return placeRepository.findPlaceCountById(id);
     };
@@ -41,13 +41,8 @@ public class PlaceService {
             }
             countArray[idx] = count.getCount();
         }
-        PlaceTimeCountResponse response = PlaceTimeCountResponse.builder()
-                .name(name)
-                .count(countArray)
-                .maxCount(maxCount)
-                .build();
 
-        return response;
+        return new PlaceTimeCountResponse(name, countArray, maxCount);
     }
 
     // 관리자용 등록

@@ -39,13 +39,13 @@ public class JdbcReservationRepository implements ReservationRepository {
         jdbcTemplate.update(connection -> {
             PreparedStatement psmt = connection.prepareStatement(sql, new String[]{"id"});
             psmt.setString(1, id.toString());
-            psmt.setString(2, request.getStudentNumber());
-            psmt.setString(3, request.getPhoneNumber());
-            psmt.setString(4, request.getPassword());
-            psmt.setString(5, request.getPlaceId());
-            psmt.setTimestamp(6, Timestamp.valueOf(request.getDate()));
-            psmt.setObject(7, request.getTimes().toArray(new Integer[0]));
-            psmt.setInt(8, request.getResCount());
+            psmt.setString(2, request.studentNumber());
+            psmt.setString(3, request.phoneNumber());
+            psmt.setString(4, request.password());
+            psmt.setString(5, request.placeId());
+            psmt.setTimestamp(6, Timestamp.valueOf(request.date()));
+            psmt.setObject(7, request.times().toArray(new Integer[0]));
+            psmt.setInt(8, request.resCount());
             return psmt;
         });
 
@@ -61,10 +61,10 @@ public class JdbcReservationRepository implements ReservationRepository {
         int updated = jdbcTemplate.update(connection -> {
             var ps = connection.prepareStatement(sql);
 
-            Integer[] times = request.getTimes().toArray(new Integer[0]);
+            Integer[] times = request.times().toArray(new Integer[0]);
             Array sqlArray = connection.createArrayOf("integer", times);
 
-            ps.setDate(1, Date.valueOf(request.getDate()));
+            ps.setDate(1, Date.valueOf(request.date()));
             ps.setArray(2, sqlArray);
             ps.setString(3, reservationId);
             return ps;
