@@ -2,6 +2,7 @@ package iceapple.placeservice.web;
 
 import iceapple.placeservice.dto.request.AdminReservationRequest;
 import iceapple.placeservice.dto.response.AdminReservationResponse;
+import iceapple.placeservice.dto.response.ApiMessageResponse;
 import iceapple.placeservice.service.ReservationService;
 import java.time.LocalDate;
 import java.util.List;
@@ -40,31 +41,41 @@ public class AdminReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createReservation(@RequestBody final AdminReservationRequest request) {
+    public ResponseEntity<ApiMessageResponse> createReservation(
+            @RequestBody final AdminReservationRequest request
+    ) {
         try {
-            return reservationService.adminCreateReservation(request);
+            reservationService.adminCreateReservation(request);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(new ApiMessageResponse("created"));
         } catch (IllegalStateException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
     @PatchMapping("/{reservation_id}")
-    public ResponseEntity<Void> updateReservation(@PathVariable("reservation_id") String reservationId,
-                                                  @RequestBody final AdminReservationRequest request) {
+    public ResponseEntity<ApiMessageResponse> updateReservation(
+            @PathVariable("reservation_id") String reservationId,
+            @RequestBody final AdminReservationRequest request
+    ) {
         try {
             reservationService.updateAdminReservation(reservationId, request);
-            return ResponseEntity.ok().build();
+            return ResponseEntity
+                    .ok(new ApiMessageResponse("updated"));
         } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
     @DeleteMapping("/{reservation_id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable("reservation_id") String reservationId) {
+    public ResponseEntity<ApiMessageResponse> deleteReservation(
+            @PathVariable("reservation_id") String reservationId
+    ) {
         try {
             reservationService.cancelReservations(List.of(reservationId));
-            return ResponseEntity.ok().build();
+            return ResponseEntity
+                    .ok(new ApiMessageResponse("deleted"));
         } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
